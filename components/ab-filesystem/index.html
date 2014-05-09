@@ -1,0 +1,118 @@
+<polymer-element name="ab-filesystem">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+    </style>
+    <input id="chooser" type="file" webkitdirectory />
+  </template>
+  <script>
+  (function() {
+
+    /* Utils */
+
+    var BASE_PATH = './apps/app-builder';
+    var FS_EXTRA = BASE_PATH + '/node_modules/fs-extra';
+
+    /* App Class */
+
+    function App(path, manifest) {
+      this.path = path;
+      this._loadManifest(manifest || {});
+    };
+
+    var p = App.prototype;
+
+    p.toJSON = function() {
+      return {
+        name: this.name,
+        appBuilder: {
+          widgets: this.rootContainer ? this.rootContainer.getWidgetsTree() : {},
+        },
+        authors: this.authors,
+        licence: this.licence,
+      };
+    };
+
+    p._loadManifest = function(manifest) {
+      this.name = manifest.name;
+      this.widgets = 'appBuilder' in manifest ? manifest.appBuilder.widgets : null;
+      this.authors = manifest.authors;
+      this.licence = manifest.licence;
+    };
+
+    Polymer('ab-filesystem', {
+
+      openApp: function(cb) {
+
+        var self = this;
+        var chooser = this.$.chooser;
+
+        function dirSelectedHandler() {
+          chooser.removeEventListener('change', dirSelectedHandler);
+          var appPath = chooser.value;
+          var app = self.getAppFromPath(appPath);
+          return cb(app);
+        }
+
+        chooser.addEventListener('change', dirSelectedHandler, false);
+        chooser.click();
+      },
+
+      saveApp: function(app) {
+        var path = require('path');
+        var fs = require(FS_EXTRA);
+        var templatePath = path.join(BASE_PATH, 'app-template');
+        fs.copySync(templatePath, app.path);
+        var manifestPath = path.join(app.path, 'manifest.json');
+        fs.writeJSONSync(manifestPath, app);
+      },
+
+      isValidAppPath: function(appPath) {
+        var path = require('path');
+        var fs = require(FS_EXTRA);
+        var stat = fs.statSync(appPath);
+        if(stat.isDirectory()) {
+          var manifestPath = path.join(appPath, 'manifest.json');
+          var exists = fs.existsSync(manifestPath);
+          if(exists) {
+            var manifest;
+            try {
+              manifest = JSON.parse(fs.readFileSync(manifestPath));
+            } catch(err) {
+              return false;
+            }
+            return manifest && ('appBuilder' in manifest);
+          } else return true;
+        } else return false;
+      },
+
+      getAppFromPath: function(appPath) {
+        var isValid = this.isValidAppPath(appPath);
+        if(!isValid) return null;
+        var manifest = this.loadAppManifest(appPath);
+        var app = new App(appPath, manifest);
+        return app;
+      },
+
+      loadAppManifest: function(appPath) {
+        var path = require('path');
+        var fs = require(FS_EXTRA);
+        var manifestPath = path.join(appPath, 'manifest.json');
+        var manifest;
+        try {
+          manifest = JSON.parse(fs.readFileSync(manifestPath));
+        } catch(err) {/* Do nothing, just define an empty manifest */};
+        return manifest || {};
+      },
+
+      isNWContext: function() {
+        return 'require' in window;
+      }
+
+    });
+
+  }());
+  </script>
+</polymer-element>

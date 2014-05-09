@@ -1,0 +1,15 @@
+
+/* Temporary, waiting for :ancestor() proper support in Polymer */
+ab-widget[view-only] > #tabs,
+*[view-only] ab-widget > #tabs {
+  display: none;
+}
+
+*[view-only] ab-container, ab-container[view-only] {
+  border: none;
+}
+
+ab-widget[removable="false"] > #tabs > #removeButton,
+*[removable="false"] > ab-widget > #tabs > #removeButton {
+  display: none;
+}

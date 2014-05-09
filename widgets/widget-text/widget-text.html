@@ -1,0 +1,65 @@
+<polymer-element name="widget-text" attributes="options">
+  <template>
+    <style>
+
+      :host #textContainer {
+        overflow-y: auto;
+      }
+
+      :host .edit textarea {
+        display: block;
+        width: 100%;
+      }
+
+      :host > ab-widget {
+        min-height: 250px;
+      }
+
+    </style>
+    <ab-widget name="Text">
+      <div class="edit">
+        <textarea rows="10" value="{{text}}" placeholder="Enter your text here..."></textarea>
+        <h3>Markdown Syntax</h3>
+        <div>
+<b>Headings</b>
+<pre>
+# Main header
+## Secondary header
+### etc
+</pre>
+<b>Unordered List</b>
+<pre>
+- First item
+- Second item
+- etc
+</pre>
+        </div>
+      </div>
+      <div id="text" class="view"></div>
+    </ab-widget>
+  </template>
+  <script type="text/javascript" src="vendor/marked.js"></script>
+  <script>
+    Polymer('widget-text', {
+
+      text: '',
+
+      textChanged: function() {
+        this.$.text.innerHTML = marked(this.text);
+      },
+
+      optionsChanged: function(oldOpts, newOpts) {
+        if(newOpts && 'text' in newOpts) {
+          this.text = newOpts.text;
+        }
+      },
+
+      exports: function() {
+        return {
+          text: this.text
+        };
+      }
+
+    });
+  </script>
+</polymer-element>

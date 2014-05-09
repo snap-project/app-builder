@@ -1,0 +1,39 @@
+<polymer-element name="ab-widgetslist"
+  on-dragstart="{{widgetDragStart}}">
+  <template>
+
+    <style type="text/css">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h3>Containers</h3>
+    <ul class="widgets-list">
+      <li class="widget" draggable="true" data-widget-type="AB-CONTAINER">
+        Basic container
+      </li>
+    </ul>
+    <h3>Widgets</h3>
+    <ul class="widgets-list">
+      <li class="widget" draggable="true" data-widget-type="WIDGET-TEXT">
+        Text
+      </li>
+      <li class="widget" draggable="true" data-widget-type="WIDGET-TIMELINE">
+        Timeline
+      </li>
+    </ul>
+
+  </template>
+  <script>
+    Polymer('ab-widgetslist', {
+
+      widgetDragStart: function(evt) {
+        var dataTransfer = evt.dataTransfer;
+        dataTransfer.effectAllowed = 'move';
+        dataTransfer.setData('application/x-ab-widget', evt.srcElement.dataset.widgetType);
+      }
+
+    });
+  </script>
+</polymer-element>

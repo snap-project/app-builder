@@ -1,0 +1,104 @@
+<polymer-element name="ab-widget" attributes="options name removable">
+  <template>
+    <style>
+
+      :host {
+        display: block;
+        width: 100%;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      :host #tabs {
+        display: block;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        height: 25px;
+        line-height: 25px;
+      }
+
+      :host #panels {
+        top: 25px;
+      }
+
+      :host .tab {
+        cursor: pointer;
+        display: inline-block;
+        padding: 0 5px;
+      }
+
+      :host .tab.selected {
+        opacity: 1;
+      }
+
+      :host > #tabs > #removeButton {
+        float: right;
+        margin-right: 5px;
+        cursor: pointer;
+      }
+
+      :ancestor([removable="false"]) > #tabs > #removeButton {
+        display: none;
+      }
+
+      :host([view-only]) #tabs, :ancestor([view-only]) #tabs {
+        display: none;
+      }
+
+    </style>
+
+    <div id="tabs">
+      <b class="widgetName">{{name}}</b>
+      <a id="viewTab" class="tab" on-click="{{showViewPane}}">View</a><a id="editTab" class="tab" on-click="{{showEditPane}}">Edit</a>
+      <a id="removeButton" on-click="{{dispatchRemoveClick}}">X</a>
+    </div>
+
+    <div id="panels">
+      <div id="editPane">
+        <content select=".edit"></content>
+      </div>
+      <div id="viewPane">
+        <content select=".view"></content>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer('ab-widget', {
+
+      removable: true,
+      name: 'Widget',
+
+      ready: function() {
+        this.showViewPane();
+      },
+
+      showEditPane: function() {
+        this.$.editPane.style.display = 'block';
+        this.$.viewPane.style.display = 'none';
+        this.$.editTab.classList.add('selected');
+        this.$.viewTab.classList.remove('selected');
+        this.fire('showEdit');
+      },
+
+      showViewPane: function() {
+        this.$.editPane.style.display = 'none';
+        this.$.viewPane.style.display = 'block';
+        this.$.editTab.classList.remove('selected');
+        this.$.viewTab.classList.add('selected');
+        this.fire('showView');
+      },
+
+      dispatchRemoveClick: function() {
+        if(this.removable) {
+          this.fire('ab-widget-remove');
+        }
+      }
+
+
+    });
+  </script>
+</polymer-element>

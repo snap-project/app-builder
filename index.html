@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <script src="bower_components/platform/platform.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="app-template/style.css">
+    <!-- Components -->
+    <link rel="import" href="bower_components/polymer/polymer.html">
+    <link rel="import" href="components/ab-filesystem/index.html">
+    <link rel="import" href="components/ab-menu/index.html">
+    <link rel="import" href="components/ab-workspace/index.html">
+    <link rel="import" href="components/ab-widgetslist/index.html">
+    <link rel="import" href="components/ab-container/index.html">
+    <link rel="import" href="components/ab-widget/index.html">
+    <!-- Widgets -->
+    <link rel="import" href="widgets/widget-text/widget-text.html">
+    <link rel="import" href="widgets/widget-timeline/widget-timeline.html">
+  </head>
+  <body unresolved>
+    <div id="container">
+      <ab-widgetslist id="widgets" class="block"></ab-widgetslist>
+      <ab-menu id="menu" class="block"></ab-menu>
+      <ab-workspace id="workspace" class="block"></ab-workspace>
+    </div>
+
+    <!--<a href="#" onclick="toggleMode()">Toggle edition mode</a>
+
+    <div id="widgets-container">
+    </div>
+
+    <script type="text/javascript">
+
+      function toggleMode() {
+        var body = document.body;
+        if(body.hasAttribute('view-only')) {
+          body.removeAttribute('view-only');
+        } else {
+          body.setAttribute('view-only', true);
+        }
+      }
+
+      function buildWidget(node) {
+        var el = document.createElement(node.type);
+        el.options = node.options;
+        if(Array.isArray(node.children)) {
+          node.children.forEach(function(childNode) {
+            var childEl = buildWidget(childNode);
+            el.appendChild(childEl);
+          });
+        }
+        return el;
+      }
+
+      window.addEventListener('WebComponentsReady', function(e) {
+
+        var widgets = {
+          "type": "SNAP-CONTAINER",
+          "options": {
+            "gutter": 1,
+            "layout": "horizontal"
+          },
+          "children": [
+            {
+              "type": "WIDGET-TEXT",
+              "options": {
+                "text": ""
+              }
+            },
+            {
+              "type": "SNAP-CONTAINER",
+              "options": {
+                "gutter": 1,
+                "layout": "vertical"
+              },
+              "children": [
+                {
+                  "type": "WIDGET-TEXT",
+                  "options": {
+                    "text": ""
+                  }
+                },
+                {
+                  "type": "WIDGET-TEXT",
+                  "options": {
+                    "text": ""
+                  }
+                },
+                {
+                  "type": "WIDGET-TIMELINE",
+                  "options": {
+
+                  }
+                }
+              ]
+            }
+          ]
+        };
+
+        var container = document.getElementById('widgets-container');
+        container.appendChild(buildWidget(widgets));
+      });
+
+
+
+    </script>-->
+  </body>
+
+</html>

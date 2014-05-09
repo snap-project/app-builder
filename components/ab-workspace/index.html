@@ -1,0 +1,73 @@
+<link rel="import" href="../../bower_components/polymer-signals/polymer-signals.html">
+<polymer-element name="ab-workspace"
+  on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}" on-ab-widget-remove="{{widgetRemove}}">
+  <template>
+    <style type="text/css">
+      :host {
+        display: block;
+      }
+    </style>
+    <polymer-signals on-polymer-signal-appchange="{{appChangedSignal}}"></polymer-signals>
+    <ab-container id="rootContainer" layout="vertical" removable="false"></ab-container>
+  </template>
+  <script>
+    Polymer('ab-workspace', {
+
+      app: null,
+
+      appChangedSignal: function(evt, app) {
+        if(app.widgets) {
+          this.$.rootContainer.innerHTML = '';
+          this.buildWidgets(app.widgets, this.$.rootContainer);
+        }
+        app.rootContainer = this.$.rootContainer;
+      },
+
+      buildWidgets: function(node, container) {
+        var self = this;
+        var el = container || document.createElement(node.type);
+        el.options = node.options;
+        if(Array.isArray(node.children)) {
+          node.children.forEach(function(childNode) {
+            var childEl = self.buildWidgets(childNode);
+            el.appendChild(childEl);
+          });
+        }
+        return el;
+      },
+
+      widgetDragOver: function(evt) {
+        if (evt.preventDefault) {
+          evt.preventDefault();
+        }
+        return false;
+      },
+
+      widgetDrop: function(evt) {
+        var dataTransfer = evt.dataTransfer;
+        var widgetType = dataTransfer.getData('application/x-ab-widget');
+        if(widgetType) {
+          var target;
+          target = evt.target === this ? this.$.rootContainer : null;
+          if(!target) {
+            target = evt.target.tagName === 'AB-CONTAINER' ? evt.target : evt.target.parentNode;
+          }
+          this.addWidget(widgetType, target);
+        }
+        return false;
+      },
+
+      addWidget: function(tagName, target) {
+        var widget = document.createElement(tagName);
+        widget.style.width = 0;
+        target.appendChild(widget);
+      },
+
+      widgetRemove: function(evt) {
+        var widget = evt.target;
+        widget.parentNode.removeChild(widget);
+      }
+
+    });
+  </script>
+</polymer-element>

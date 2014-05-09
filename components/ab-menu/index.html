@@ -1,0 +1,64 @@
+<link rel="import" href="../ab-filesystem/index.html">
+<polymer-element name="ab-menu">
+  <template>
+    <ab-filesystem id="fs"></ab-filesystem>
+    <style type="text/css">
+      :host {
+        display: block;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+    <button on-click="{{openApp}}" disabled?="{{!isNWContext}}">Open App</button>
+    <button on-click="{{toggleView}}">Toggle "View" mode</button>
+    <fieldset disabled?="{{!app}}">
+      <legend>App</legend>
+      <label>Name</label>
+      <input type="text" value="{{app.name}}" />
+      <label>Authors</label>
+      <input type="text" value="{{app.authors}}" />
+      <label>Licence</label>
+      <input type="text" value="{{app.licence}}" />
+    </fieldset>
+    <button on-click="{{saveApp}}" disabled?="{{!app}}">Save App</button>
+  </template>
+  <script>
+    Polymer('ab-menu', {
+
+      app: null,
+      isNWContext: false,
+
+      ready: function() {
+        this.isNWContext = this.$.fs.isNWContext();
+      },
+
+      openApp: function() {
+        var self = this;
+        this.$.fs.openApp(function(app) {
+          if(app) {
+            self.app = app;
+            self.asyncFire('polymer-signal', {name: 'appchange', data: app});
+          } else {
+            alert('Invalid app folder !');
+          }
+        });
+      },
+
+      saveApp: function() {
+        this.$.fs.saveApp(this.app);
+        alert("App saved !");
+      },
+
+      toggleView: function() {
+        var viewOnly = document.body.hasAttribute('view-only');
+        if(viewOnly) {
+          document.body.removeAttribute('view-only');
+        } else {
+          document.body.setAttribute('view-only', true);
+        }
+      },
+
+    });
+  </script>
+</polymer-element>
