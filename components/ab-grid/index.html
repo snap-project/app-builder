@@ -1,0 +1,213 @@
+<polymer-element name="ab-grid"
+  on-mousedown="{{_startResizing}}" on-mouseup="{{_stopResizing}}"
+  on-mousemove="{{_resize}}" on-mouseleave="{{_stopResizing}}">
+  <template>
+    <style>
+
+      :host {
+        display: block;
+        position: relative;
+        background: whiteSmoke;
+      }
+
+      :host > * {
+
+        display: block;
+        border: 1px solid #ccc;
+        position: absolute;
+
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+
+        -moz-transform: translateX(50%) translateY(50%);
+        -webkit-transform: translateX(50%) translateY(50%);
+        -o-transform: translateX(50%) translateY(50%);
+        -ms-transform: translateX(50%) translateY(50%);
+        transform: translateX(50%) translateY(50%);
+
+        -webkit-transition: -webkit-transform 500ms ease;
+        -moz-transition: -moz-transform 500ms ease;
+        -ms-transition: ms-transform 500ms ease;
+        -o-transition: -o-transform 500ms ease;
+        transition: transform 500ms ease;
+
+      }
+
+      :host > *:after {
+        bottom: 1px;
+        right: 2px;
+        content: '◿';
+        display: block;
+        position: absolute;
+        cursor: nwse-resize;
+        pointer-events: none;
+        color: #ccc;
+      }
+
+      :host > #placeholder {
+        position: absolute;
+        background-color: blue;
+        opacity: 0.5;
+      }
+
+    </style>
+    <content id="content" select="*"></content>
+    <div id="placeholder"></div>
+  </template>
+  <script>
+    (function() {
+
+      var slice = Array.prototype.slice;
+
+      var prefixes = ['moz', 'o', 'webkit', 'ms', ''];
+      function _translate(el, xOffset, yOffset) {
+        var transform = 'translateX(' + xOffset + 'px) translateY(' + yOffset + 'px)';
+        prefixes.forEach(function(prefix) {
+          el.style['-' + prefix + '-transform'] = transform;
+        });
+        el.style.transform = transform;
+      }
+
+      Polymer('ab-grid', {
+
+        columns: 5,
+        rows: 10,
+        gutter: 10,
+
+        _resizeZoneSize: 20,
+        _lastMousePos: null,
+        _resizedElem: null,
+
+        domReady: function() {
+          this._map = {};
+          this.compute();
+          this.render();
+        },
+
+        getCell: function(c, r) {
+          return this._map[c + '-' + r];
+        },
+
+        isFilled: function(c, r) {
+          return (c + '-' + r) in this._map;
+        },
+
+        fill: function(el, c, r) {
+          var width = +el.dataset.width;
+          var height = +el.dataset.height;
+          for(var cc = c; cc < c+width; ++cc) {
+            for(var rr = r; rr < r+height; ++rr) {
+              this._map[cc + '-' + rr] = el;
+            }
+          }
+        },
+
+        unfill: function(c, r, width, height) {
+          width = width || 1;
+          height = height || 1;
+          for(var cc = c; cc < c+width; ++cc) {
+            for(var rr = r; rr < r+height; ++rr) {
+              delete this._map[cc + '-' + rr];
+            }
+          }
+        },
+
+        isSpaceAvailable: function(c, r, width, height) {
+          for(var cc = c; cc < c+width; ++cc) {
+            for(var rr = r; rr < r+height; ++rr) {
+              if(cc > this.columns || this.isFilled(cc, rr)) {
+                return false;
+              }
+            }
+          }
+          return true
+        },
+
+        getNextAvailableCell: function(el) {
+          var isSpaceAvailable;
+          var width = +el.dataset.width;
+          var height = +el.dataset.height;
+          for(var r = 0, rows = this.rows; r < rows; ++r) {
+            for(var c = 0, columns = this.columns; c < columns; ++c) {
+              isSpaceAvailable = this.isSpaceAvailable(c, r, width, height);
+              if(isSpaceAvailable) {
+                return {c: c, r: r};
+              }
+            }
+          }
+        },
+
+        getCellSize: function() {
+          return {
+            width: this.clientWidth/this.columns,
+            height: this.clientHeight/this.rows,
+          };
+        },
+
+        getElementCountInRow: function() {
+
+        },
+
+        compute: function() {
+          var self = this;
+          var elements = self.$.content.getDistributedNodes();
+          slice.call(elements).forEach(function(el) {
+            var width = el.dataset.width = +el.dataset.width || 1;
+            var height = el.dataset.height = +el.dataset.height || 1;
+            var cell = self.getNextAvailableCell(el);
+            self.fill(el, cell.c, cell.r);
+            el.dataset.column = cell.c;
+            el.dataset.row = cell.r;
+          });
+        },
+
+        render: function() {
+          var self = this;
+          var cellSize = this.getCellSize();
+          var elements = self.$.content.getDistributedNodes();
+          slice.call(elements).forEach(function(el) {
+            var width = +el.dataset.width;
+            var height = +el.dataset.height;
+            var column = +el.dataset.column;
+            var row = +el.dataset.row;
+            _translate(el, column * cellSize.width, row * cellSize.height);
+            el.style.height = height * cellSize.height + 'px';
+            el.style.width = width * cellSize.width + 'px';
+          });
+        },
+
+        _inResizeZone: function(el, x, y) {
+          var width = el.clientWidth;
+          var height = el.clientHeight;
+          return x >= width - this._resizeZoneSize && y >= height - this._resizeZoneSize;
+        },
+
+        _startResizing: function(evt) {
+          var localMouseX = 'offsetX' in evt ? evt.offsetX : evt.layerX;
+          var localMouseY = 'offsetY' in evt ? evt.offsetY : evt.layerY;
+          if(this._resizedElem || this._inResizeZone(evt.target, localMouseX, localMouseY)) {
+            this._resizedElem = evt.target;
+            evt.preventDefault();
+          }
+        },
+
+        _stopResizing: function() {
+          this._resizedElem = null;
+        },
+
+        _resize: function(evt) {
+          if(this._resizedElem) {
+            var globalMouseX = evt.offsetX;
+            var globalMouseY = evt.offsetY;
+            var rect = this._resizedElem.getBoundingClientRect();
+            this._resizedElem.style.width = rect.width + (globalMouseX-rect.width);
+            this._resizedElem.style.height = rect.height + (globalMouseY-rect.height);
+            evt.preventDefault();
+          }
+        }
+
+    });
+  }());
+  </script>
+</polymer-element>
