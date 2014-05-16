@@ -198,11 +198,9 @@
 
         _resize: function(evt) {
           if(this._resizedElem) {
-            var globalMouseX = evt.offsetX;
-            var globalMouseY = evt.offsetY;
             var rect = this._resizedElem.getBoundingClientRect();
-            this._resizedElem.style.width = rect.width + (globalMouseX-rect.width);
-            this._resizedElem.style.height = rect.height + (globalMouseY-rect.height);
+            this._resizedElem.style.width = evt.pageX - rect.left
+            this._resizedElem.style.height = evt.pageY - rect.top;
             evt.preventDefault();
           }
         }
