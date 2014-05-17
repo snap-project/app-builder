@@ -1,4 +1,4 @@
-<polymer-element name="ab-grid"
+<polymer-element name="ab-grid" attributes="columns rows"
   on-mousedown="{{_startResizing}}" on-mouseup="{{_stopResizing}}"
   on-mousemove="{{_resize}}" on-mouseleave="{{_stopResizing}}">
   <template>
@@ -13,42 +13,56 @@
       :host > * {
 
         display: block;
-        border: 1px solid #ccc;
         position: absolute;
 
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
 
-        -moz-transform: translateX(50%) translateY(50%);
-        -webkit-transform: translateX(50%) translateY(50%);
-        -o-transform: translateX(50%) translateY(50%);
-        -ms-transform: translateX(50%) translateY(50%);
-        transform: translateX(50%) translateY(50%);
+        -webkit-transition: -webkit-transform 250ms ease;
+        -moz-transition: -moz-transform 250ms ease;
+        -ms-transition: -ms-transform 250ms ease;
+        -o-transition: -o-transform 250ms ease;
+        transition: transform 250ms ease;
 
-        -webkit-transition: -webkit-transform 500ms ease;
-        -moz-transition: -moz-transform 500ms ease;
-        -ms-transition: ms-transform 500ms ease;
-        -o-transition: -o-transform 500ms ease;
-        transition: transform 500ms ease;
+        background-color: white;
+
+        z-index: 10;
 
       }
 
-      :host > *:after {
-        bottom: 1px;
+      :host > *::after {
+        bottom: 2px;
         right: 2px;
-        content: '◿';
+        width: 10px;
+        height: 10px;
+        content: '';
         display: block;
         position: absolute;
-        cursor: nwse-resize;
         pointer-events: none;
         color: #ccc;
+        border-bottom: 3px solid #ccc;
+        border-right: 3px solid #ccc;
       }
 
-      :host > #placeholder {
-        position: absolute;
-        background-color: blue;
-        opacity: 0.5;
+      #placeholder {
+
+        border: 3px dashed rgba(0, 112, 255, 0.5);
+        background-color: transparent;
+
+        -webkit-transition: width 250ms ease, height 250ms ease;
+        -moz-transition: width 250ms ease, height 250ms ease;
+        -ms-transition: width 250ms ease, height 250ms ease;
+        -o-transition: width 250ms ease, height 250ms ease;
+        transition: width 250ms ease, height 250ms ease;
+
+        z-index: 1;
+        opacity: 1;
+
+      }
+
+      #placeholder::after {
+        border: none;
       }
 
     </style>
@@ -61,6 +75,7 @@
       var slice = Array.prototype.slice;
 
       var prefixes = ['moz', 'o', 'webkit', 'ms', ''];
+
       function _translate(el, xOffset, yOffset) {
         var transform = 'translateX(' + xOffset + 'px) translateY(' + yOffset + 'px)';
         prefixes.forEach(function(prefix) {
@@ -69,6 +84,208 @@
         el.style.transform = transform;
       }
 
+      // Grid logic
+
+      var GridLayout = function(columns, rows) {
+        this._counter = 0;
+        this.columns = columns;
+        this.rows = rows;
+        this._cells = {};
+      };
+
+      var p = GridLayout.prototype;
+
+      p.getElementInCell = function(row, column) {
+        return this._cells[row + '-' + column];
+      };
+
+      p.getElementsInRect = function(top, left, width, height) {
+        var elements = [];
+        var id;
+        for(var column = left; column < left+width; ++column) {
+          for(var row = top; row < top+height; ++row) {
+            id = this.getElementInCell(row, column);
+            if(id && elements.indexOf(id) === -1) {
+              elements.push(id);
+            }
+            id = null;
+          }
+        }
+        return elements;
+      };
+
+      p.isFilled = function(row, column) {
+        return (row + '-' + column) in this._cells;
+      };
+
+      p.fill = function(id, top, left, width, height) {
+        for(var column = left; column < left+width; ++column) {
+          for(var row = top; row < top+height; ++row) {
+            this._cells[row + '-' + column] = id;
+          }
+        }
+      };
+
+      p.unfill = function(top, left, width, height) {
+        width = width || 1;
+        height = height || 1;
+        for(var column = left; column < left+width; ++column) {
+          for(var row = top; row < top+height; ++row) {
+            delete this._cells[row + '-' + column];
+          }
+        }
+      };
+
+      p.isSpaceAvailable = function(top, left, width, height) {
+        if(top < 0 || left < 0) {
+          return false;
+        }
+        for(var column = left; column < left+width; ++column) {
+          for(var row = top; row < top+height; ++row) {
+            if(column > this.columns || this.isFilled(row, column)) {
+              return false;
+            }
+          }
+        }
+        return true;
+      };
+
+      p.getAvailableInsertionPoint = function(width, height) {
+        var isSpaceAvailable;
+        for(var top = 0, rows = this.rows; top < rows; ++top) {
+          for(var left = 0, columns = this.columns; left < columns; ++left) {
+            isSpaceAvailable = this.isSpaceAvailable(top, left, width, height);
+            if(isSpaceAvailable) {
+              return {left: left, top: top};
+            }
+          }
+        }
+      };
+
+      p.insert = function(element, rect) {
+        var id = this.getElementId(element);
+        if(!id) {
+          id = this.registerElement(element);
+        }
+        if(rect && rect.top && rect.left) {
+          this.fill(id, rect.top, rect.left, rect.width || 1, rect.height || 1);
+        } else {
+          var pos = this.getAvailableInsertionPoint(rect.width || 1, rect.height || 1);
+          this.fill(id, pos.top, pos.left, rect.width || 1, rect.height || 1);
+        }
+      };
+
+      p.resize = function(id, toWidth, toHeight) {
+        var self = this;
+        var rect = self.getElementRect(id);
+        var collisions = self.getElementsInRect(rect.top, rect.left, toWidth, toHeight);
+        collisions.forEach(function(collId) {
+          if(id !== collId) {
+            self.moveDown(collId, rect.top + toHeight);
+          }
+        });
+        self.unfill(rect.top, rect.left, rect.width, rect.height);
+        self.fill(id, rect.top, rect.left, toWidth, toHeight);
+      };
+
+      p.moveDown = function(id, toRow) {
+        var self = this;
+        var rect = self.getElementRect(id);
+        self.unfill(rect.top, rect.left, rect.width, rect.height);
+        var ids = this.getElementsInRect(toRow, rect.left, rect.width, rect.height);
+        ids.forEach(function(id) {
+          self.moveDown(id, toRow + rect.height);
+        });
+        this.fill(id, toRow, rect.left, rect.width, rect.height);
+      };
+
+      p.compact = function() {
+        var self = this;
+        var elements = this.getElements();
+        elements.forEach(function(id) {
+          var rect = self.getElementRect(id);
+          var rowOffset = 1;
+          var isSpaceAvailable = self.isSpaceAvailable(rect.top-rowOffset, rect.left, rect.width, 1);
+          while(isSpaceAvailable) {
+            rowOffset++;
+            isSpaceAvailable = self.isSpaceAvailable(rect.top-rowOffset, rect.left, rect.width, 1);
+            if(!isSpaceAvailable) {
+              self.unfill(rect.top, rect.left, rect.width, rect.height);
+              self.fill(id, rect.top-rowOffset+1, rect.left, rect.width, rect.height);
+            }
+          };
+        });
+      };
+
+      p.getElementId = function(element) {
+        return element.dataset.gridId;
+      };
+
+      p.registerElement = function(element) {
+        var id = 'grid_' + this._counter++;
+        element.dataset.gridId = id;
+        return id;
+      };
+
+      p.getElementSize = function(id) {
+        var pos = this.getElementPosition(id);
+        if(!pos) {
+          return {width: 1, height: 1};
+        }
+        var size = {width: 0, height: 0};
+        var row = pos.top;
+        while(!size.height) {
+          if(id !== this.getElementInCell(row, pos.left)) {
+            size.height = row-pos.top;
+          }
+          row++;
+        }
+        var column = pos.left;
+        while(!size.width) {
+          if(id !== this.getElementInCell(pos.top, column)) {
+            size.width = column-pos.left;
+          }
+          column++;
+        }
+        return size;
+      };
+
+      p.getElementPosition = function(id) {
+        var current;
+        for(var top = 0, rows = this.rows; top < rows; ++top) {
+          for(var left = 0, columns = this.columns; left < columns; ++left) {
+            current =  this.getElementInCell(top, left);
+            if(current === id) {
+              return {top: top, left: left};
+            }
+          }
+        }
+      };
+
+      p.getElementRect = function(id) {
+        var size = this.getElementSize(id);
+        var pos = this.getElementPosition(id);
+        return {
+          top: pos.top,
+          left: pos.left,
+          width: size.width,
+          height: size.height
+        };
+      };
+
+      p.getElements = function() {
+        var cells = this._cells;
+        return Object.keys(cells).reduce(function(arr, cellId) {
+          var id = cells[cellId];
+          if(arr.indexOf(id) === -1) {
+            arr.push(id);
+          }
+          return arr;
+        }, []);
+      };
+
+      // Polymer element
+
       Polymer('ab-grid', {
 
         columns: 5,
@@ -76,104 +293,79 @@
         gutter: 10,
 
         _resizeZoneSize: 20,
-        _lastMousePos: null,
         _resizedElem: null,
 
         domReady: function() {
-          this._map = {};
-          this.compute();
+          this._layout = new GridLayout(this.columns, this.rows);
+          this._initializeGrid();
           this.render();
         },
 
-        getCell: function(c, r) {
-          return this._map[c + '-' + r];
-        },
-
-        isFilled: function(c, r) {
-          return (c + '-' + r) in this._map;
-        },
-
-        fill: function(el, c, r) {
-          var width = +el.dataset.width;
-          var height = +el.dataset.height;
-          for(var cc = c; cc < c+width; ++cc) {
-            for(var rr = r; rr < r+height; ++rr) {
-              this._map[cc + '-' + rr] = el;
-            }
-          }
-        },
-
-        unfill: function(c, r, width, height) {
-          width = width || 1;
-          height = height || 1;
-          for(var cc = c; cc < c+width; ++cc) {
-            for(var rr = r; rr < r+height; ++rr) {
-              delete this._map[cc + '-' + rr];
-            }
-          }
-        },
-
-        isSpaceAvailable: function(c, r, width, height) {
-          for(var cc = c; cc < c+width; ++cc) {
-            for(var rr = r; rr < r+height; ++rr) {
-              if(cc > this.columns || this.isFilled(cc, rr)) {
-                return false;
-              }
-            }
-          }
-          return true
-        },
-
-        getNextAvailableCell: function(el) {
-          var isSpaceAvailable;
-          var width = +el.dataset.width;
-          var height = +el.dataset.height;
-          for(var r = 0, rows = this.rows; r < rows; ++r) {
-            for(var c = 0, columns = this.columns; c < columns; ++c) {
-              isSpaceAvailable = this.isSpaceAvailable(c, r, width, height);
-              if(isSpaceAvailable) {
-                return {c: c, r: r};
-              }
-            }
-          }
+        _initializeGrid: function() {
+          var self = this;
+          var elements = self.$.content.getDistributedNodes();
+          slice.call(elements).forEach(function(element) {
+            self._layout.insert(element, {
+              top: +element.dataset.gridTop,
+              left: +element.dataset.gridLeft,
+              width: +element.dataset.gridWidth,
+              height: +element.dataset.gridHeight
+            });
+          });
         },
 
         getCellSize: function() {
           return {
-            width: this.clientWidth/this.columns,
-            height: this.clientHeight/this.rows,
+            width: (this.clientWidth - (this.gutter * (this.columns-1)))/this.columns,
+            height: (this.clientHeight - (this.gutter * (this.rows-1)))/this.rows,
           };
         },
 
-        getElementCountInRow: function() {
-
-        },
-
-        compute: function() {
-          var self = this;
-          var elements = self.$.content.getDistributedNodes();
-          slice.call(elements).forEach(function(el) {
-            var width = el.dataset.width = +el.dataset.width || 1;
-            var height = el.dataset.height = +el.dataset.height || 1;
-            var cell = self.getNextAvailableCell(el);
-            self.fill(el, cell.c, cell.r);
-            el.dataset.column = cell.c;
-            el.dataset.row = cell.r;
-          });
+        getRoundedSize: function(el) {
+          var rect = el.getBoundingClientRect();
+          var cellSize = this.getCellSize();
+          var hRatio = rect.width/cellSize.width;
+          var hFloor = hRatio >> 0;
+          var vRatio = rect.height/cellSize.height;
+          var vFloor = vRatio >> 0;
+          return {
+            width: (hFloor + ((hRatio - hFloor > 0.10) ?  1 : 0)) * cellSize.width + hFloor * this.gutter,
+            height: (vFloor + ((vRatio - vFloor > 0.10) ?  1 : 0)) * cellSize.height + vFloor * this.gutter
+          };
         },
 
         render: function() {
+
           var self = this;
           var cellSize = this.getCellSize();
           var elements = self.$.content.getDistributedNodes();
+
           slice.call(elements).forEach(function(el) {
-            var width = +el.dataset.width;
-            var height = +el.dataset.height;
-            var column = +el.dataset.column;
-            var row = +el.dataset.row;
-            _translate(el, column * cellSize.width, row * cellSize.height);
-            el.style.height = height * cellSize.height + 'px';
-            el.style.width = width * cellSize.width + 'px';
+
+            var id = self._layout.getElementId(el);
+            var rect = self._layout.getElementRect(id);
+
+            _translate(
+              el,
+              rect.left * cellSize.width + rect.left * self.gutter,
+              rect.top * cellSize.height + rect.top * self.gutter
+            );
+
+            el.draggable = true;
+
+            // Update data attributes
+            el.dataset.gridWidth = rect.width;
+            el.dataset.gridHeight = rect.height;
+            el.dataset.gridLeft = rect.left;
+            el.dataset.gridTop = rect.top;
+
+            // Update size and position
+            el.style.height = rect.height * cellSize.height + ((rect.height-1) * self.gutter);
+            el.style.width = rect.width * cellSize.width + ((rect.width-1) * self.gutter);
+            el.style.minWidth = cellSize.width;
+            el.style.minHeight = cellSize.height;
+            el.innerHTML = el.dataset.gridId;
+
           });
         },
 
@@ -188,21 +380,70 @@
           var localMouseY = 'offsetY' in evt ? evt.offsetY : evt.layerY;
           if(this._resizedElem || this._inResizeZone(evt.target, localMouseX, localMouseY)) {
             this._resizedElem = evt.target;
+            this._updatePlaceholder(this._resizedElem);
+            this._togglePlaceholder(true);
             evt.preventDefault();
           }
         },
 
         _stopResizing: function() {
+          var el = this._resizedElem;
+          if(el) {
+            var roundedSize = this.getRoundedSize(el);
+            el.style.width = roundedSize.width;
+            el.style.height = roundedSize.height;
+            this._togglePlaceholder(false);
+          }
           this._resizedElem = null;
         },
 
         _resize: function(evt) {
-          if(this._resizedElem) {
-            var rect = this._resizedElem.getBoundingClientRect();
-            this._resizedElem.style.width = evt.pageX - rect.left
-            this._resizedElem.style.height = evt.pageY - rect.top;
+          var el = this._resizedElem;
+          if(el) {
+
+            var left = +el.dataset.gridLeft;
+            var top = +el.dataset.gridTop;
+
+            var roundedSize = this.getRoundedSize(el);
+            var cellSize = this.getCellSize();
+            var width = roundedSize.width / cellSize.width >> 0;
+            var height = roundedSize.height / cellSize.height >> 0;
+            var id = this._layout.getElementId(el);
+
+            this._layout.resize(id, width, height);
+            this._layout.compact();
+
+            this.render();
+
+            var rect = el.getBoundingClientRect();
+            el.style.width = evt.pageX - rect.left - window.scrollX;
+            el.style.height = evt.pageY - rect.top - window.scrollY;
+
+            this._updatePlaceholder(el);
+
             evt.preventDefault();
           }
+        },
+
+        _togglePlaceholder: function(isVisible) {
+          this.$.placeholder.style.display = isVisible ? 'block' : 'none';
+        },
+
+        _updatePlaceholder: function(el) {
+          var placeholder = this.$.placeholder;
+          var cellSize = this.getCellSize();
+          var roundedSize = this.getRoundedSize(el);
+          var left = +el.dataset.gridLeft || 0;
+          var top = +el.dataset.gridTop || 0;
+          placeholder.style.minWidth = cellSize.width;
+          placeholder.style.minHeight = cellSize.height;
+          placeholder.style.height = roundedSize.height;
+          placeholder.style.width = roundedSize.width;
+          _translate(
+            placeholder,
+            left * cellSize.width + left * this.gutter,
+            top * cellSize.height + top * this.gutter
+          );
         }
 
     });
