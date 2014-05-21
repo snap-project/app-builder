@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  position: relative;
+  background: whiteSmoke;
+}
+
+:host > * {
+
+  display: block;
+  position: absolute;
+
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+
+  -webkit-transition: -webkit-transform 250ms ease;
+  -moz-transition: -moz-transform 250ms ease;
+  -ms-transition: -ms-transform 250ms ease;
+  -o-transition: -o-transform 250ms ease;
+  transition: transform 250ms ease;
+
+  background-color: white;
+
+  z-index: 10;
+
+}
+
+:host > *::after {
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  content: '';
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  color: #ccc;
+  border-bottom: 2px solid #ccc;
+  border-right: 2px solid #ccc;
+}
+
+#placeholder {
+
+  border: 2px dashed rgba(0, 112, 255, 0.5);
+  background-color: transparent;
+
+  -webkit-transition: width 250ms ease, height 250ms ease;
+  -moz-transition: width 250ms ease, height 250ms ease;
+  -ms-transition: width 250ms ease, height 250ms ease;
+  -o-transition: width 250ms ease, height 250ms ease;
+  transition: width 250ms ease, height 250ms ease;
+
+  z-index: 1;
+  opacity: 1;
+
+}
+
+#placeholder::after {
+  border: none;
+}

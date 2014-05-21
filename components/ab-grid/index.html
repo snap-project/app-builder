@@ -2,70 +2,7 @@
   on-mousedown="{{_startResizing}}" on-mouseup="{{_stopResizing}}"
   on-mousemove="{{_resize}}" on-mouseleave="{{_stopResizing}}">
   <template>
-    <style>
-
-      :host {
-        display: block;
-        position: relative;
-        background: whiteSmoke;
-      }
-
-      :host > * {
-
-        display: block;
-        position: absolute;
-
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-
-        -webkit-transition: -webkit-transform 250ms ease;
-        -moz-transition: -moz-transform 250ms ease;
-        -ms-transition: -ms-transform 250ms ease;
-        -o-transition: -o-transform 250ms ease;
-        transition: transform 250ms ease;
-
-        background-color: white;
-
-        z-index: 10;
-
-      }
-
-      :host > *::after {
-        bottom: 2px;
-        right: 2px;
-        width: 10px;
-        height: 10px;
-        content: '';
-        display: block;
-        position: absolute;
-        pointer-events: none;
-        color: #ccc;
-        border-bottom: 3px solid #ccc;
-        border-right: 3px solid #ccc;
-      }
-
-      #placeholder {
-
-        border: 3px dashed rgba(0, 112, 255, 0.5);
-        background-color: transparent;
-
-        -webkit-transition: width 250ms ease, height 250ms ease;
-        -moz-transition: width 250ms ease, height 250ms ease;
-        -ms-transition: width 250ms ease, height 250ms ease;
-        -o-transition: width 250ms ease, height 250ms ease;
-        transition: width 250ms ease, height 250ms ease;
-
-        z-index: 1;
-        opacity: 1;
-
-      }
-
-      #placeholder::after {
-        border: none;
-      }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css">
     <content id="content" select="*"></content>
     <div id="placeholder"></div>
   </template>
@@ -288,9 +225,9 @@
 
       Polymer('ab-grid', {
 
-        columns: 5,
+        columns: 10,
         rows: 10,
-        gutter: 10,
+        gutter: 15,
 
         _resizeZoneSize: 20,
         _resizedElem: null,
@@ -326,11 +263,13 @@
           var cellSize = this.getCellSize();
           var hRatio = rect.width/cellSize.width;
           var hFloor = hRatio >> 0;
+          var hOffset = ((hRatio - hFloor > 0.10) ?  1 : 0);
           var vRatio = rect.height/cellSize.height;
           var vFloor = vRatio >> 0;
+          var vOffset = ((vRatio - vFloor > 0.10) ?  1 : 0);
           return {
-            width: (hFloor + ((hRatio - hFloor > 0.10) ?  1 : 0)) * cellSize.width + hFloor * this.gutter,
-            height: (vFloor + ((vRatio - vFloor > 0.10) ?  1 : 0)) * cellSize.height + vFloor * this.gutter
+            width: (hFloor + hOffset) * cellSize.width + (hOffset ?  hFloor : hFloor-1) * this.gutter,
+            height: (vFloor + vOffset) * cellSize.height + (vOffset ?  vFloor : vFloor-1) * this.gutter,
           };
         },
 
@@ -375,10 +314,17 @@
           return x >= width - this._resizeZoneSize && y >= height - this._resizeZoneSize;
         },
 
+        _getRelMousePos: function(evt) {
+          var rect = evt.target.getBoundingClientRect();
+          return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+          };
+        },
+
         _startResizing: function(evt) {
-          var localMouseX = 'offsetX' in evt ? evt.offsetX : evt.layerX;
-          var localMouseY = 'offsetY' in evt ? evt.offsetY : evt.layerY;
-          if(this._resizedElem || this._inResizeZone(evt.target, localMouseX, localMouseY)) {
+          var pos = this._getRelMousePos(evt);
+          if(this._resizedElem || this._inResizeZone(evt.target, pos.x, pos.y)) {
             this._resizedElem = evt.target;
             this._updatePlaceholder(this._resizedElem);
             this._togglePlaceholder(true);
