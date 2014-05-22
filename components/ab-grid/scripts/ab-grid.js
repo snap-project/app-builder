@@ -42,26 +42,30 @@
 
     getRoundedSize: function(width, height) {
       var cellSize = this.getCellSize();
-      var hRatio = width/(cellSize.width + this.gutter);
-      var hFloor = hRatio >> 0;
-      var hOffset = ((hRatio - hFloor > 0.10) ?  1 : 0);
-      var vRatio = height/(cellSize.height + this.gutter);
-      var vFloor = vRatio >> 0;
-      var vOffset = ((vRatio - vFloor > 0.10) ?  1 : 0);
+      var gridPos = this.toGridSpace(width, height);
+      var hGutterOffset = gridPos.column ? (gridPos.column-1)* this.gutter : 0;
+      var vGutterOffset = gridPos.row ? (gridPos.row-1)* this.gutter : 0;
       return {
-        width: (hFloor + hOffset) * cellSize.width + (hOffset ?  hFloor : hFloor-1) * this.gutter,
-        height: (vFloor + vOffset) * cellSize.height + (vOffset ?  vFloor : vFloor-1) * this.gutter,
+        width: gridPos.column * cellSize.width + hGutterOffset,
+        height: gridPos.row * cellSize.height + vGutterOffset
       };
     },
 
-    getSnappedPos: function(top, left) {
+    toGridSpace: function(x, y) {
+
       var cellSize = this.getCellSize();
-      var hRatio = left/(cellSize.width + this.gutter);
-      var vRatio = top/(cellSize.height + this.gutter);
+      var hRatio = x/(cellSize.width + this.gutter);
+      var hFloor = hRatio >> 0;
+      var hOffset = ((hRatio - hFloor > 0.25) ? 1 : 0);
+      var vRatio = y/(cellSize.height + this.gutter);
+      var vFloor = vRatio >> 0;
+      var vOffset = ((vRatio - vFloor > 0.25) ? 1 : 0);
+
       return {
-        left: (hRatio >> 0) * cellSize.width,
-        top: (vRatio >> 0) * cellSize.height
+        column: hFloor + hOffset,
+        row: vFloor + vOffset
       };
+
     },
 
     render: function() {
@@ -72,8 +76,7 @@
 
       slice.call(elements).forEach(function(el) {
 
-        var id = self._layout.getElementId(el);
-        var rect = self._layout.getElementRect(id);
+        var rect = self._layout.getElementRect(el);
 
         el.style.left = rect.left * cellSize.width + rect.left * self.gutter;
         el.style.top = rect.top * cellSize.height + rect.top * self.gutter;
@@ -91,6 +94,8 @@
         el.style.width = rect.width * cellSize.width + ((rect.width-1) * self.gutter);
         el.style.minWidth = cellSize.width;
         el.style.minHeight = cellSize.height;
+        
+        //Temp
         el.innerHTML = el.dataset.gridId;
 
       });
@@ -105,8 +110,8 @@
     _getRelativeMousePos: function(evt, el) {
       var rect = (el || evt.target).getBoundingClientRect();
       return {
-        left: evt.clientX - rect.left,
-        top: evt.clientY - rect.top
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
       };
     },
 
@@ -116,44 +121,59 @@
       var dataTransfer = evt.dataTransfer;
       dataTransfer.effectAllowed = 'move';
       dataTransfer.dropEffect = 'move';
-      var id = this._layout.getElementId(evt.srcElement);
-      this._draggedEl = evt.srcElement;
-      evt.srcElement.classList.add('moving');
-      dataTransfer.setData('application/x-ab-grid', id);
+      var el = this._draggedEl = evt.target;
+      el.classList.add('moving')
       this._togglePlaceholder(true);
     },
 
     _dragEnd: function(evt) {
-      evt.srcElement.classList.remove('moving');
       this._togglePlaceholder(false);
+      this._draggedEl.classList.remove('moving');
       this._draggedEl = null;
       this.render();
     },
 
     _dragOver: function(evt) {
+
       if (evt.preventDefault) {
         evt.preventDefault();
       }
+
+      var el = this._draggedEl;
+      var cellSize = this.getCellSize();
       var pos = this._getRelativeMousePos(evt, this);
-      var rect = this._draggedEl.getBoundingClientRect();
-      var snappedPos = this.getSnappedPos(pos.left, pos.top);
+      var rect = el.getBoundingClientRect();
+      var id = this._layout.getElementId(el);
+
+      pos.x -= rect.width/2;
+      pos.y -= rect.height/2;
+
+      var grid = this.toGridSpace(pos.x, pos.y);
+
       this._updatePlaceholder({
-        top: snappedPos.top,
-        left: snappedPos.left,
+        top: grid.row * cellSize.height + grid.row * this.gutter,
+        left: grid.column * cellSize.width + grid.column * this.gutter,
         width: rect.width,
         height: rect.height
       });
+
+      this._layout.move(id, grid.row, grid.column);
+      this._layout.compact();
+
       this.render();
+
       return false;
+
     },
 
     /* Resizing */
 
     _startResizing: function(evt) {
       var pos = this._getRelativeMousePos(evt);
-      if(this._resizedElem || this._inResizeZone(evt.target, pos.left, pos.top)) {
+      if(this._resizedElem || this._inResizeZone(evt.target, pos.x, pos.y)) {
         this._resizedElem = evt.target;
-        this._updateResizePlaceholder(this._resizedElem);
+        var rect = this._getResizePlaceholderRect(this._resizedElem);
+        this._updatePlaceholder(rect);
         this._togglePlaceholder(true);
         evt.preventDefault();
       }
@@ -194,7 +214,8 @@
         el.style.width = evt.pageX - rect.left - window.scrollX;
         el.style.height = evt.pageY - rect.top - window.scrollY;
 
-        this._updateResizePlaceholder(el);
+        var rect = this._getResizePlaceholderRect(el);
+        this._updatePlaceholder(rect);
 
         evt.preventDefault();
       }
@@ -205,29 +226,35 @@
     },
 
     _updatePlaceholder: function(rect) {
+
       var cellSize = this.getCellSize();
       var placeholder = this.$.placeholder;
+
       placeholder.style.minWidth = cellSize.width;
       placeholder.style.minHeight = cellSize.height;
       placeholder.style.height = rect.height;
       placeholder.style.width = rect.width;
       placeholder.style.left = rect.left;
       placeholder.style.top = rect.top;
+
     },
 
-    _updateResizePlaceholder: function(el) {
-      var placeholder = this.$.placeholder;
-      var cellSize = this.getCellSize();
-      var rect = el.getBoundingClientRect();
-      var roundedSize = this.getRoundedSize(rect.width, rect.height);
+    _getResizePlaceholderRect: function(el) {
+
+      var rect = {};
       var left = +el.dataset.gridLeft || 0;
       var top = +el.dataset.gridTop || 0;
-      placeholder.style.minWidth = cellSize.width;
-      placeholder.style.minHeight = cellSize.height;
-      placeholder.style.height = roundedSize.height;
-      placeholder.style.width = roundedSize.width;
-      placeholder.style.left = left * cellSize.width + left * this.gutter;
-      placeholder.style.top = top * cellSize.height + top * this.gutter;
+      var elRect = el.getBoundingClientRect();
+      var cellSize = this.getCellSize();
+      var roundedSize = this.getRoundedSize(elRect.width, elRect.height);
+
+      rect.left = left * cellSize.width + left * this.gutter;
+      rect.top = top * cellSize.height + top * this.gutter;
+      rect.height = roundedSize.height;
+      rect.width = roundedSize.width;
+
+      return rect;
+
     }
 
 });
