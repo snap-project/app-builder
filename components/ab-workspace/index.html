@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer-signals/polymer-signals.html">
+<link rel="import" href="../ab-grid/index.html">
 <polymer-element name="ab-workspace"
   on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}" on-ab-widget-remove="{{widgetRemove}}">
   <template>
@@ -6,9 +7,15 @@
       :host {
         display: block;
       }
+
+      #grid {
+        width: 100%;
+        height: 100%;
+      }
+
     </style>
     <polymer-signals on-polymer-signal-appchange="{{appChangedSignal}}"></polymer-signals>
-    <ab-container id="rootContainer" layout="vertical" removable="false"></ab-container>
+    <ab-grid id="grid" columns="5" rows="5"></ab-grid>
   </template>
   <script>
     Polymer('ab-workspace', {
@@ -17,10 +24,9 @@
 
       appChangedSignal: function(evt, app) {
         if(app.widgets) {
-          this.$.rootContainer.innerHTML = '';
-          this.buildWidgets(app.widgets, this.$.rootContainer);
+          this.$.grid.innerHTML = '';
+          //this.buildWidgets(app.widgets, this.$.grid);
         }
-        app.rootContainer = this.$.rootContainer;
       },
 
       buildWidgets: function(node, container) {
@@ -47,20 +53,10 @@
         var dataTransfer = evt.dataTransfer;
         var widgetType = dataTransfer.getData('application/x-ab-widget');
         if(widgetType) {
-          var target;
-          target = evt.target === this ? this.$.rootContainer : null;
-          if(!target) {
-            target = evt.target.tagName === 'AB-CONTAINER' ? evt.target : evt.target.parentNode;
-          }
-          this.addWidget(widgetType, target);
+          var widget = document.createElement(widgetType);
+          this.$.grid.appendChild(widget);
         }
         return false;
-      },
-
-      addWidget: function(tagName, target) {
-        var widget = document.createElement(tagName);
-        widget.style.width = 0;
-        target.appendChild(widget);
       },
 
       widgetRemove: function(evt) {

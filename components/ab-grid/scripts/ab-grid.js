@@ -9,6 +9,9 @@
     columns: 10,
     rows: 10,
     gutter: 15,
+    resizable: true,
+    removable: true,
+    draggable: true,
 
     _resizeZoneSize: 20,
     _resizedElem: null,
@@ -16,11 +19,22 @@
 
     domReady: function() {
       this._layout = new GridLayout(this.columns, this.rows);
-      this._initializeGrid();
+      this._watchMutations();
+      this._updateAndRender();
+    },
+
+    _watchMutations: function() {
+      var observer = new MutationObserver(this._updateAndRender.bind(this));
+      var config = {childList: true};
+      observer.observe(this, config);
+    },
+
+    _updateAndRender: function() {
+      this._updateGridLayout();
       this.render();
     },
 
-    _initializeGrid: function() {
+    _updateGridLayout: function() {
       var self = this;
       var elements = self.$.content.getDistributedNodes();
       slice.call(elements).forEach(function(element) {
@@ -81,7 +95,9 @@
         el.style.left = rect.left * cellSize.width + rect.left * self.gutter;
         el.style.top = rect.top * cellSize.height + rect.top * self.gutter;
 
-        el.draggable = true;
+        el.draggable = self.draggable;
+        el.classList.toggle('resizable', self.resizable);
+        el.classList.toggle('removable', self.removable);
 
         // Update data attributes
         el.dataset.gridWidth = rect.width;
@@ -94,9 +110,6 @@
         el.style.width = rect.width * cellSize.width + ((rect.width-1) * self.gutter);
         el.style.minWidth = cellSize.width;
         el.style.minHeight = cellSize.height;
-        
-        //Temp
-        el.innerHTML = el.dataset.gridId;
 
       });
     },
@@ -123,11 +136,10 @@
       dataTransfer.dropEffect = 'move';
       var el = this._draggedEl = evt.target;
       el.classList.add('moving')
-      this._togglePlaceholder(true);
+      this._togglePlaceholder(false);
     },
 
     _dragEnd: function(evt) {
-      this._togglePlaceholder(false);
       this._draggedEl.classList.remove('moving');
       this._draggedEl = null;
       this.render();
@@ -139,28 +151,32 @@
         evt.preventDefault();
       }
 
-      var el = this._draggedEl;
-      var cellSize = this.getCellSize();
-      var pos = this._getRelativeMousePos(evt, this);
-      var rect = el.getBoundingClientRect();
-      var id = this._layout.getElementId(el);
+      if(this._draggedEl) {
 
-      pos.x -= rect.width/2;
-      pos.y -= rect.height/2;
+        var el = this._draggedEl;
+        var cellSize = this.getCellSize();
+        var pos = this._getRelativeMousePos(evt, this);
+        var rect = el.getBoundingClientRect();
+        var id = this._layout.getElementId(el);
 
-      var grid = this.toGridSpace(pos.x, pos.y);
+        pos.x -= rect.width/2;
+        pos.y -= rect.height/2;
 
-      this._updatePlaceholder({
-        top: grid.row * cellSize.height + grid.row * this.gutter,
-        left: grid.column * cellSize.width + grid.column * this.gutter,
-        width: rect.width,
-        height: rect.height
-      });
+        var grid = this.toGridSpace(pos.x, pos.y);
 
-      this._layout.move(id, grid.row, grid.column);
-      this._layout.compact();
+        this._updatePlaceholder({
+          top: grid.row * cellSize.height + grid.row * this.gutter,
+          left: grid.column * cellSize.width + grid.column * this.gutter,
+          width: rect.width,
+          height: rect.height
+        });
 
-      this.render();
+        this._layout.move(id, grid.row, grid.column);
+        this._layout.compact();
+
+        this.render();
+
+      }
 
       return false;
 

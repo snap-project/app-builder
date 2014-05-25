@@ -69,10 +69,6 @@ ab-container {
   transition: all 250ms linear;
 }
 
-ab-widget {
-  background-color: #eee;
-}
-
 ab-container > ab-widget {
   background-color: #fff;
 }

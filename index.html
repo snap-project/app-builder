@@ -9,114 +9,19 @@
     <link rel="import" href="components/ab-menu/index.html">
     <link rel="import" href="components/ab-workspace/index.html">
     <link rel="import" href="components/ab-widgetslist/index.html">
-    <link rel="import" href="components/ab-container/index.html">
     <link rel="import" href="components/ab-widget/index.html">
-    <link rel="import" href="components/ab-grid/index.html">
     <!-- Widgets -->
     <link rel="import" href="widgets/widget-text/widget-text.html">
     <link rel="import" href="widgets/widget-timeline/widget-timeline.html">
   </head>
   <body unresolved>
-    <!--<div id="container">
+
+    <div id="container">
       <ab-widgetslist id="widgets" class="block"></ab-widgetslist>
       <ab-menu id="menu" class="block"></ab-menu>
       <ab-workspace id="workspace" class="block"></ab-workspace>
-    </div>-->
-
-    <ab-grid style="width: 800px; height: 800px" columns="10" rows="10">
-      <div data-grid-width="2" data-grid-height="4">4</div>
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-      <div>5</div>
-      <div>6</div>
-      <div>7</div>
-      <div>8</div>
-      <div>9</div>
-      <div>10</div>
-      <div>11</div>
-    </ab-grid>
-
-    <!--<a href="#" onclick="toggleMode()">Toggle edition mode</a>
-
-    <div id="widgets-container">
     </div>
 
-    <script type="text/javascript">
-
-      function toggleMode() {
-        var body = document.body;
-        if(body.hasAttribute('view-only')) {
-          body.removeAttribute('view-only');
-        } else {
-          body.setAttribute('view-only', true);
-        }
-      }
-
-      function buildWidget(node) {
-        var el = document.createElement(node.type);
-        el.options = node.options;
-        if(Array.isArray(node.children)) {
-          node.children.forEach(function(childNode) {
-            var childEl = buildWidget(childNode);
-            el.appendChild(childEl);
-          });
-        }
-        return el;
-      }
-
-      window.addEventListener('WebComponentsReady', function(e) {
-
-        var widgets = {
-          "type": "SNAP-CONTAINER",
-          "options": {
-            "gutter": 1,
-            "layout": "horizontal"
-          },
-          "children": [
-            {
-              "type": "WIDGET-TEXT",
-              "options": {
-                "text": ""
-              }
-            },
-            {
-              "type": "SNAP-CONTAINER",
-              "options": {
-                "gutter": 1,
-                "layout": "vertical"
-              },
-              "children": [
-                {
-                  "type": "WIDGET-TEXT",
-                  "options": {
-                    "text": ""
-                  }
-                },
-                {
-                  "type": "WIDGET-TEXT",
-                  "options": {
-                    "text": ""
-                  }
-                },
-                {
-                  "type": "WIDGET-TIMELINE",
-                  "options": {
-
-                  }
-                }
-              ]
-            }
-          ]
-        };
-
-        var container = document.getElementById('widgets-container');
-        container.appendChild(buildWidget(widgets));
-      });
-
-
-
-    </script>-->
   </body>
 
 </html>

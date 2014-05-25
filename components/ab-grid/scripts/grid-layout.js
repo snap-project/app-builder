@@ -25,12 +25,11 @@ var GridLayout = (function() {
       id = this._registerElement(el);
     }
 
-    if(rect && rect.top && rect.left) {
+    if(rect && Number.isInteger(rect.top) && Number.isInteger(rect.left)) {
       if(!isNew) {
         var currentRect = this.getElementRect(el);
         this._unfill(currentRect);
       }
-
       this._free(rect, [id]);
       this._fill(id, rect);
     } else {
@@ -131,14 +130,14 @@ var GridLayout = (function() {
     if(!pos) {
       return {width: 1, height: 1};
     }
-    
+
     while(!size.height) {
       if(id !== this._getElementInCell(row, pos.left)) {
         size.height = row-pos.top;
       }
       row++;
     }
-    
+
     while(!size.width) {
       if(id !== this._getElementInCell(pos.top, column)) {
         size.width = column-pos.left;

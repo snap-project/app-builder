@@ -23,20 +23,39 @@
 
   z-index: 10;
 
+  overflow: auto;
+
 }
 
-:host > *::after {
-  bottom: 2px;
-  right: 2px;
-  width: 10px;
-  height: 10px;
+:host > .resizable, :host > .removable {
+  padding-right: 20px;
+}
+
+:host > .resizable::after {
+  bottom: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
   content: '';
   display: block;
   position: absolute;
+  border-bottom: 3px solid #ccc;
+  border-right: 3px solid #ccc;
+  cursor: se-resize;
   pointer-events: none;
+}
+
+:host > .removable::before {
+  content: '✕';
+  top: 2px;
+  right: 2px;
+  font-size: 18px;
+  display: block;
+  position: absolute;
   color: #ccc;
-  border-bottom: 2px solid #ccc;
-  border-right: 2px solid #ccc;
+  font-weight: bold;
+  cursor: pointer;
+  pointer-events: none;
 }
 
 :host > *.moving {
@@ -45,7 +64,7 @@
 
 #placeholder {
 
-  border: 2px dashed rgba(0, 112, 255, 0.5);
+  border: 3px dashed rgba(0, 112, 255, 0.5);
   background-color: transparent;
 
   -webkit-transition: width 250ms ease, height 250ms ease;
@@ -55,12 +74,13 @@
   transition: width 250ms ease, height 250ms ease;
 
   z-index: 1;
-  opacity: 1;
+  display: none;
 
 }
 
-#placeholder::after {
+#placeholder::after, #placeholder::before {
   border: none;
+  content: '';
 }
 
 [draggable] {
