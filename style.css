@@ -56,11 +56,6 @@ html, body {
   box-sizing: border-box;
 }
 
-
-ab-container {
-  border: 2px dashed #aaa;
-}
-
 .view > * {
   -webkit-transition: all 250ms linear;
   -moz-transition: all 250ms linear;
@@ -69,10 +64,7 @@ ab-container {
   transition: all 250ms linear;
 }
 
-ab-container > ab-widget {
-  background-color: #fff;
-}
-
 ab-widget #panels {
   padding: 5px;
 }
+

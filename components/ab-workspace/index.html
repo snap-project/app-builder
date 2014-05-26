@@ -3,7 +3,9 @@
 <polymer-element name="ab-workspace"
   on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}" on-ab-widget-remove="{{widgetRemove}}">
   <template>
+
     <style type="text/css">
+
       :host {
         display: block;
       }
@@ -14,8 +16,10 @@
       }
 
     </style>
+
     <polymer-signals on-polymer-signal-appchange="{{appChangedSignal}}"></polymer-signals>
     <ab-grid id="grid" columns="5" rows="5"></ab-grid>
+
   </template>
   <script>
     Polymer('ab-workspace', {
@@ -52,6 +56,7 @@
       widgetDrop: function(evt) {
         var dataTransfer = evt.dataTransfer;
         var widgetType = dataTransfer.getData('application/x-ab-widget');
+        console.log(widgetType);
         if(widgetType) {
           var widget = document.createElement(widgetType);
           this.$.grid.appendChild(widget);

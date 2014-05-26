@@ -208,7 +208,9 @@
     },
 
     _resize: function(evt) {
+
       var el = this._resizedElem;
+
       if(el) {
 
         var left = +el.dataset.gridLeft;
@@ -230,11 +232,17 @@
         el.style.width = evt.pageX - rect.left - window.scrollX;
         el.style.height = evt.pageY - rect.top - window.scrollY;
 
+        console.log(evt.pageX - rect.left - window.scrollX);
+
         var rect = this._getResizePlaceholderRect(el);
         this._updatePlaceholder(rect);
 
         evt.preventDefault();
+
       }
+
+      return false;
+
     },
 
     _togglePlaceholder: function(isVisible) {

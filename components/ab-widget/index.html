@@ -12,7 +12,7 @@
         overflow: auto;
       }
 
-      :host #tabs {
+      #tabs {
         display: block;
         margin: 0;
         padding: 0;
@@ -21,28 +21,24 @@
         line-height: 25px;
       }
 
-      :host #panels {
+      #panels {
         top: 25px;
       }
 
-      :host .tab {
+      .tab {
         cursor: pointer;
         display: inline-block;
         padding: 0 5px;
       }
 
-      :host .tab.selected {
+      .tab.selected {
         opacity: 1;
       }
 
-      :host > #tabs > #removeButton {
+      #tabs > #removeButton {
         float: right;
         margin-right: 5px;
         cursor: pointer;
-      }
-
-      :ancestor([removable="false"]) > #tabs > #removeButton {
-        display: none;
       }
 
       :host([view-only]) #tabs, :ancestor([view-only]) #tabs {
