@@ -25,25 +25,6 @@ html, body {
   font-size: 10px;
 }
 
-#widgets .widgets-list {
-  display: block;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-#widgets .widgets-list .widget {
-  display: block;
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
-  text-align: center;
-  background: #ccc;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  margin-bottom: 5px;
-}
-
 #workspace {
   overflow: auto;
 }

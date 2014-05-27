@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer-signals/polymer-signals.html">
 <link rel="import" href="../ab-grid/index.html">
 <polymer-element name="ab-workspace"
-  on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}" on-ab-widget-remove="{{widgetRemove}}">
+  on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}">
   <template>
 
     <style type="text/css">
@@ -47,26 +47,28 @@
       },
 
       widgetDragOver: function(evt) {
-        if (evt.preventDefault) {
-          evt.preventDefault();
+        
+        if(evt.dataTransfer.effectAllowed === 'copy') {
+
+          if (evt.preventDefault) {
+            evt.preventDefault();
+          }
+
+          evt.dataTransfer.dropEffect = 'copy';
+          
+          return false;
         }
-        return false;
+        
       },
 
       widgetDrop: function(evt) {
         var dataTransfer = evt.dataTransfer;
         var widgetType = dataTransfer.getData('application/x-ab-widget');
-        console.log(widgetType);
         if(widgetType) {
           var widget = document.createElement(widgetType);
           this.$.grid.appendChild(widget);
         }
         return false;
-      },
-
-      widgetRemove: function(evt) {
-        var widget = evt.target;
-        widget.parentNode.removeChild(widget);
       }
 
     });

@@ -64,7 +64,7 @@ polyfill-next-selector { content: ':host > .removable::before'; }
 
 polyfill-next-selector { content: ':host > *.moving'; }
 ::content .moving {
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
 #placeholder {

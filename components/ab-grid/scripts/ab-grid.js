@@ -14,7 +14,8 @@
     draggable: true,
 
     _resizeZoneSize: 20,
-    _resizedElem: null,
+
+    _resizedEl: null,
     _draggedEl: null,
 
     domReady: function() {
@@ -23,28 +24,12 @@
       this._updateAndRender();
     },
 
-    _watchMutations: function() {
-      var observer = new MutationObserver(this._updateAndRender.bind(this));
-      var config = {childList: true};
-      observer.observe(this, config);
+    isDragging: function() {
+      return !!this._draggedEl;
     },
 
-    _updateAndRender: function() {
-      this._updateGridLayout();
-      this.render();
-    },
-
-    _updateGridLayout: function() {
-      var self = this;
-      var elements = self.$.content.getDistributedNodes();
-      slice.call(elements).forEach(function(element) {
-        self._layout.insert(element, {
-          top: +element.dataset.gridTop,
-          left: +element.dataset.gridLeft,
-          width: +element.dataset.gridWidth,
-          height: +element.dataset.gridHeight
-        });
-      });
+    isResizing: function() {
+      return !!this._resizedEl;
     },
 
     getCellSize: function() {
@@ -114,6 +99,30 @@
       });
     },
 
+    _watchMutations: function() {
+      var observer = new MutationObserver(this._updateAndRender.bind(this));
+      var config = {childList: true};
+      observer.observe(this, config);
+    },
+
+    _updateAndRender: function() {
+      this._updateGridLayout();
+      this.render();
+    },
+
+    _updateGridLayout: function() {
+      var self = this;
+      var elements = self.$.content.getDistributedNodes();
+      slice.call(elements).forEach(function(element) {
+        self._layout.insert(element, {
+          top: +element.dataset.gridTop,
+          left: +element.dataset.gridLeft,
+          width: +element.dataset.gridWidth,
+          height: +element.dataset.gridHeight
+        });
+      });
+    },
+
     _inResizeZone: function(el, x, y) {
       var width = el.clientWidth;
       var height = el.clientHeight;
@@ -131,27 +140,38 @@
     /* Drag & Drop */
 
     _dragStart: function(evt) {
-      var dataTransfer = evt.dataTransfer;
-      dataTransfer.effectAllowed = 'move';
-      dataTransfer.dropEffect = 'move';
-      var el = this._draggedEl = evt.target;
-      el.classList.add('moving')
-      this._togglePlaceholder(false);
+      var el = evt.target;
+      var gridId = this._layout.getElementId(el);
+      if(!this.isResizing() && gridId) {
+        var dataTransfer = evt.dataTransfer;
+        dataTransfer.setData('application/x-ab-grid-id', gridId);
+        dataTransfer.effectAllowed = 'move';
+        this._draggedEl = el;
+        el.classList.add('moving');
+        this._togglePlaceholder(false);
+        console.log('Start dragging')
+      }
     },
 
     _dragEnd: function(evt) {
-      this._draggedEl.classList.remove('moving');
-      this._draggedEl = null;
-      this.render();
+      if(this.isDragging()) {
+        this._draggedEl.classList.remove('moving');
+        this._draggedEl = null;
+        this.render();
+      }
     },
 
     _dragOver: function(evt) {
 
-      if (evt.preventDefault) {
-        evt.preventDefault();
-      }
+      if(this.isDragging()) {
 
-      if(this._draggedEl) {
+        if (evt.preventDefault) {
+          evt.preventDefault();
+        }
+
+        console.log('Dragged over')
+
+        evt.dataTransfer.dropEffect = 'move';
 
         var el = this._draggedEl;
         var cellSize = this.getCellSize();
@@ -176,43 +196,54 @@
 
         this.render();
 
-      }
+        return false;
 
-      return false;
+      }
 
     },
 
     /* Resizing */
 
     _startResizing: function(evt) {
-      var pos = this._getRelativeMousePos(evt);
-      if(this._resizedElem || this._inResizeZone(evt.target, pos.x, pos.y)) {
-        this._resizedElem = evt.target;
-        var rect = this._getResizePlaceholderRect(this._resizedElem);
-        this._updatePlaceholder(rect);
-        this._togglePlaceholder(true);
-        evt.preventDefault();
+
+      if(!this.isDragging()) {
+
+        var pos = this._getRelativeMousePos(evt);
+
+        if(this.isResizing() || this._inResizeZone(evt.target, pos.x, pos.y)) {
+          var el = this._resizedEl = evt.target;
+          el.classList.add('moving');
+          var rect = this._getResizePlaceholderRect(el);
+          this._updatePlaceholder(rect);
+          console.log('Start resizing')
+          this._togglePlaceholder(true);
+        }
+
       }
+
     },
 
     _stopResizing: function() {
-      var el = this._resizedElem;
-      if(el) {
+
+      if(this.isResizing()) {
+        var el = this._resizedEl;
         var rect = el.getBoundingClientRect();
         var roundedSize = this.getRoundedSize(rect.width, rect.height);
         el.style.width = roundedSize.width;
         el.style.height = roundedSize.height;
         this._togglePlaceholder(false);
+        console.log('Stop resizing')
+        el.classList.remove('moving');
+        this._resizedEl = null;
       }
-      this._resizedElem = null;
+
     },
 
     _resize: function(evt) {
 
-      var el = this._resizedElem;
+      if(this.isResizing()) {
 
-      if(el) {
-
+        var el = this._resizedEl;
         var left = +el.dataset.gridLeft;
         var top = +el.dataset.gridTop;
 
@@ -232,16 +263,10 @@
         el.style.width = evt.pageX - rect.left - window.scrollX;
         el.style.height = evt.pageY - rect.top - window.scrollY;
 
-        console.log(evt.pageX - rect.left - window.scrollX);
-
         var rect = this._getResizePlaceholderRect(el);
         this._updatePlaceholder(rect);
 
-        evt.preventDefault();
-
       }
-
-      return false;
 
     },
 
