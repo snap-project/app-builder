@@ -13,7 +13,15 @@
         display: none;
       }
 
+      #title {
+        font-size: 26px;
+        font-family: 'monospace';
+        border-bottom: 1px dashed #ccc;
+      }
+
     </style>
+
+    <h1 id="title">AppBuilder</h1>
 
     <button on-click="{{openApp}}" disabled?="{{!isNWContext}}">Open App</button>
     <button on-click="{{toggleView}}">Toggle "View" mode</button>

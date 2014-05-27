@@ -1,7 +1,6 @@
 :host {
   display: block;
   position: relative;
-  background: whiteSmoke;
 }
 
 polyfill-next-selector { content: ':host > *'; }
@@ -20,8 +19,6 @@ polyfill-next-selector { content: ':host > *'; }
   -o-transition: top 250ms ease, left 250ms ease;
   transition: top 250ms ease, left 250ms ease;
 
-  background-color: white;
-
   z-index: 10;
 
   overflow: auto;
@@ -32,6 +29,12 @@ polyfill-next-selector { content: ':host > .resizable, :host > .removable'; }
 ::content .resizable, ::content > .removable {
   padding-right: 20px;
 }
+
+polyfill-next-selector { content: ':host > .resizable:hover, :host > .removable:hover'; }
+::content .resizable:hover, ::content > .removable:hover {
+  border: 3px solid rgba(0, 112, 255, 0.5);
+}
+
 
 polyfill-next-selector { content: ':host > .resizable::after'; }
 ::content .resizable::after {

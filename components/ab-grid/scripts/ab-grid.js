@@ -13,7 +13,7 @@
     removable: true,
     draggable: true,
 
-    _resizeZoneSize: 20,
+    _clickZoneSize: 20,
 
     _resizedEl: null,
     _draggedEl: null,
@@ -126,7 +126,12 @@
     _inResizeZone: function(el, x, y) {
       var width = el.clientWidth;
       var height = el.clientHeight;
-      return x >= width - this._resizeZoneSize && y >= height - this._resizeZoneSize;
+      return x >= width - this._clickZoneSize && y >= height - this._clickZoneSize;
+    },
+
+    _inRemoveZone: function(el, x, y) {
+      var width = el.clientWidth;
+      return x >= width - this._clickZoneSize && y <= this._clickZoneSize;
     },
 
     _getRelativeMousePos: function(evt, el) {
@@ -135,6 +140,19 @@
         x: evt.clientX - rect.left,
         y: evt.clientY - rect.top
       };
+    },
+
+    /* Remove */
+
+    _removeElement: function(evt) {
+      var pos = this._getRelativeMousePos(evt);
+      var el = evt.target;
+      if(this._inRemoveZone(el, pos.x, pos.y)) {
+        this.removeChild(el);
+        this._layout.remove(el);
+        this._layout.compact();
+        this.render();
+      }
     },
 
     /* Drag & Drop */
@@ -149,7 +167,6 @@
         this._draggedEl = el;
         el.classList.add('moving');
         this._togglePlaceholder(false);
-        console.log('Start dragging')
       }
     },
 
@@ -168,8 +185,6 @@
         if (evt.preventDefault) {
           evt.preventDefault();
         }
-
-        console.log('Dragged over')
 
         evt.dataTransfer.dropEffect = 'move';
 
@@ -215,9 +230,15 @@
           el.classList.add('moving');
           var rect = this._getResizePlaceholderRect(el);
           this._updatePlaceholder(rect);
-          console.log('Start resizing')
           this._togglePlaceholder(true);
+
+          // Prevent D&D
+          evt.preventDefault();
+          return false;
+
         }
+
+
 
       }
 
@@ -232,7 +253,6 @@
         el.style.width = roundedSize.width;
         el.style.height = roundedSize.height;
         this._togglePlaceholder(false);
-        console.log('Stop resizing')
         el.classList.remove('moving');
         this._resizedEl = null;
       }

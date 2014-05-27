@@ -1,8 +1,7 @@
 <polymer-element name="ab-grid" attributes="columns rows removable resizable"
-  on-dragstart="{{_dragStart}}" on-dragend="{{_dragEnd}}"
-  on-dragover="{{_dragOver}}"
-  on-mousedown="{{_startResizing}}" on-mouseup="{{_stopResizing}}"
-  on-mousemove="{{_resize}}">
+  on-dragstart="{{_dragStart}}" on-dragend="{{_dragEnd}}" on-dragover="{{_dragOver}}"
+  on-mousedown="{{_startResizing}}" on-mouseup="{{_stopResizing}}" on-mousemove="{{_resize}}"
+  on-click="{{_removeElement}}">
   <template>
     <link rel="stylesheet" type="text/css" href="style.css">
     <content id="content" select="*"></content>

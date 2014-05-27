@@ -27,7 +27,7 @@ var GridLayout = (function() {
 
     if(rect && Number.isInteger(rect.top) && Number.isInteger(rect.left)) {
       if(!isNew) {
-        var currentRect = this.getElementRect(el);
+        var currentRect = this.getElementRect(id);
         this._unfill(currentRect);
       }
       this._free(rect, [id]);
@@ -46,6 +46,15 @@ var GridLayout = (function() {
       });
     }
 
+  };
+
+  p.remove = function(el) {
+    var id = this.getElementId(el);
+    if(id) {
+      var rect = this.getElementRect(id);
+      this._unfill(rect);
+      this._unregisterElement(el);
+    }
   };
 
   p.resize = function(id, toWidth, toHeight) {
@@ -326,13 +335,13 @@ var GridLayout = (function() {
   };
 
   p._registerElement = function(element) {
-
     var id = 'grid_' + this._counter++;
-
     element.dataset.gridId = id;
-
     return id;
+  };
 
+  p._unregisterElement = function(element) {
+    delete element.dataset.gridId;
   };
 
   return GridLayout;
