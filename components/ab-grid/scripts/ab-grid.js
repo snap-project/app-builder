@@ -194,9 +194,6 @@
         var rect = el.getBoundingClientRect();
         var id = this._layout.getElementId(el);
 
-        pos.x -= rect.width/2;
-        pos.y -= rect.height/2;
-
         var grid = this.toGridSpace(pos.x, pos.y);
 
         this._updatePlaceholder({
@@ -207,7 +204,6 @@
         });
 
         this._layout.move(id, grid.row, grid.column);
-        this._layout.compact();
 
         this.render();
 
@@ -226,9 +222,11 @@
         var pos = this._getRelativeMousePos(evt);
 
         if(this.isResizing() || this._inResizeZone(evt.target, pos.x, pos.y)) {
+
           var el = this._resizedEl = evt.target;
-          el.classList.add('moving');
           var rect = this._getResizePlaceholderRect(el);
+
+          el.classList.add('moving');
           this._updatePlaceholder(rect);
           this._togglePlaceholder(true);
 
@@ -238,8 +236,6 @@
 
         }
 
-
-
       }
 
     },
@@ -247,14 +243,18 @@
     _stopResizing: function() {
 
       if(this.isResizing()) {
+
         var el = this._resizedEl;
         var rect = el.getBoundingClientRect();
         var roundedSize = this.getRoundedSize(rect.width, rect.height);
+
         el.style.width = roundedSize.width;
         el.style.height = roundedSize.height;
+
         this._togglePlaceholder(false);
         el.classList.remove('moving');
         this._resizedEl = null;
+
       }
 
     },
@@ -274,17 +274,17 @@
         var height = roundedSize.height / cellSize.height >> 0;
         var id = this._layout.getElementId(el);
 
-        this._layout.resize(id, width, height);
-        this._layout.compact();
+        var resized = this._layout.resize(id, width, height);
 
         this.render();
 
-        var rect = el.getBoundingClientRect();
-        el.style.width = evt.pageX - rect.left - window.scrollX;
-        el.style.height = evt.pageY - rect.top - window.scrollY;
-
-        var rect = this._getResizePlaceholderRect(el);
-        this._updatePlaceholder(rect);
+        if(resized) {
+          var rect = el.getBoundingClientRect();
+          el.style.width = evt.pageX - rect.left - window.scrollX;
+          el.style.height = evt.pageY - rect.top - window.scrollY;
+          var rect = this._getResizePlaceholderRect(el);
+          this._updatePlaceholder(rect);
+        }
 
       }
 

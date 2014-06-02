@@ -2,6 +2,21 @@
 
 var GridLayout = (function() {
 
+  // isInteger polyfill
+  var isInteger = (function() {
+
+    if('isInteger' in Number) {
+      return Number.isInteger;
+    } else return function(nVal) {
+      return typeof nVal === "number" &&
+        isFinite(nVal) &&
+        nVal > -9007199254740992 &&
+        nVal < 9007199254740992 &&
+        Math.floor(nVal) === nVal;
+    }
+
+  }());
+
   var GridLayout = function(columns, rows) {
     this._counter = 0;
     this.columns = columns;
@@ -25,7 +40,7 @@ var GridLayout = (function() {
       id = this._registerElement(el);
     }
 
-    if(rect && Number.isInteger(rect.top) && Number.isInteger(rect.left)) {
+    if(rect && isInteger(rect.top) && isInteger(rect.left)) {
       if(!isNew) {
         var currentRect = this.getElementRect(id);
         this._unfill(currentRect);
@@ -61,27 +76,44 @@ var GridLayout = (function() {
 
     var rect = this.getElementRect(id);
 
-    this._free({
+    this._unfill(rect);
+
+    var freed = this._free({
       top: rect.top,
       left: rect.left,
       width: toWidth,
       height: toHeight
     }, [id]);
 
-    this._unfill(rect);
+    if(freed) {
+      this._fill(id, {
+        top: rect.top,
+        left: rect.left,
+        width: toWidth,
+        height: toHeight
+      });
+    } else {
+      this._fill(id, rect);
+    }
 
-    this._fill(id, {
-      top: rect.top,
-      left: rect.left,
-      width: toWidth,
-      height: toHeight
-    });
+    this.compact();
+
+    return freed;
 
   };
 
   p.move = function(id, toRow, toCol) {
 
     var rect = this.getElementRect(id);
+
+    if(toCol + rect.width > this.columns) {
+      toCol = this.columns - rect.width;
+    }
+
+    if(toRow + rect.height > this.rows) {
+      toRow = this.rows - rect.height;
+    }
+
     var dest = {
       top: toRow,
       left: toCol,
@@ -92,6 +124,8 @@ var GridLayout = (function() {
     this._unfill(rect);
     this._free(dest);
     this._fill(id, dest);
+
+    this.compact();
 
   };
 
@@ -279,14 +313,21 @@ var GridLayout = (function() {
 
     ignore = ignore || [];
 
-    var self = this;
+    var id;
     var collisions = this._getElementsInRect(rect);
+    var moved;
 
-    collisions.forEach(function(id) {
+    for(var i = 0, len = collisions.length; i < len; ++i) {
+      id = collisions[i];
       if(ignore.indexOf(id) === -1) {
-        self._moveDown(id, rect.top + rect.height);
+        moved = this._moveDown(id, rect.top + rect.height);
+        if(!moved) {
+          return false;
+        }
       }
-    });
+    }
+
+    return true;
 
   };
 
@@ -313,24 +354,33 @@ var GridLayout = (function() {
 
   p._moveDown = function(id, toRow) {
 
-    var self = this;
-    var rect = self.getElementRect(id);
+    var rect = this.getElementRect(id);
 
-    self._unfill(rect);
+    if(toRow + rect.height > this.rows) {
+      return false;
+    }
 
-    this._free({
+    this._unfill(rect);
+
+    var freed = this._free({
       top: toRow,
       left: rect.left,
       width: rect.width,
       height: rect.height
     }, [id]);
 
-    this._fill(id, {
-      top: toRow,
-      left: rect.left,
-      width: rect.width,
-      height: rect.height
-    });
+    if(freed) {
+      this._fill(id, {
+        top: toRow,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
+      });
+    } else {
+      this._fill(id, rect);
+    }
+
+    return freed;
 
   };
 

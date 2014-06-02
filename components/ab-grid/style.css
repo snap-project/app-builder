@@ -25,19 +25,15 @@ polyfill-next-selector { content: ':host > *'; }
 
 }
 
-polyfill-next-selector { content: ':host > .resizable, :host > .removable'; }
-::content .resizable, ::content > .removable {
+polyfill-next-selector { content: ':host > .resizable:hover, :host > .removable:hover, :host > .moving'; }
+::content .resizable:hover, ::content > .removable:hover, ::content > .moving {
+  border: 3px solid rgba(0, 112, 255, 0.5);
   padding-right: 20px;
 }
 
-polyfill-next-selector { content: ':host > .resizable:hover, :host > .removable:hover'; }
-::content .resizable:hover, ::content > .removable:hover {
-  border: 3px solid rgba(0, 112, 255, 0.5);
-}
 
-
-polyfill-next-selector { content: ':host > .resizable::after'; }
-::content .resizable::after {
+polyfill-next-selector { content: ':host > .resizable:hover::after, :host > .resizable.moving::after'; }
+::content > .resizable:hover::after, ::content > .resizable.moving::after {
   bottom: 3px;
   right: 3px;
   width: 8px;
@@ -51,8 +47,8 @@ polyfill-next-selector { content: ':host > .resizable::after'; }
   pointer-events: none;
 }
 
-polyfill-next-selector { content: ':host > .removable::before'; }
-::content .removable::before {
+polyfill-next-selector { content: ':host > .removable:hover::before, :host > .removable.moving::before'; }
+::content > .removable:hover::before, ::content > .removable.moving::before {
   content: '✕';
   top: 2px;
   right: 2px;

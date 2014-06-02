@@ -1,4 +1,4 @@
-<polymer-element name="ab-widget" attributes="options name removable">
+<polymer-element name="ab-widget" attributes="options" on-mouseenter="{{showView}}">
   <template>
     <style>
 
@@ -10,84 +10,89 @@
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
         overflow: auto;
+        position: relative;
       }
 
-      #tabs {
-        display: block;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        height: 25px;
-        line-height: 25px;
-      }
-
-      #panels {
-        top: 25px;
-      }
-
-      .tab {
-        cursor: pointer;
-        display: inline-block;
-        padding: 0 5px;
-      }
-
-      .tab.selected {
-        opacity: 1;
-      }
-
-      #tabs > #removeButton {
-        float: right;
-        margin-right: 5px;
-        cursor: pointer;
-      }
-
-      :host([view-only]) #tabs, :ancestor([view-only]) #tabs {
+      polyfill-next-selector { content: ':host > *'; }
+      * ::content {
         display: none;
+      }
+
+      #modal {
+        background-color: #fff;
+        opacity: 0.5;
+      }
+
+      #modal button {
+        border: none;
+        background-color: rgb(0, 112, 255);
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -20px;
+        margin-top: -15px;
+        height: 30px;
+        width: 50px;
+      }
+
+      polyfill-next-selector { content: ':host > .visible'; }
+      ::content > .visible {
+        display: block !important;
+      }
+
+      polyfill-next-selector { content: ':host(:hover) #modal'; }
+      :host(:hover) #modal {
+        display: block;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      #edit.visible~#modal {
+        display: none !important;
       }
 
     </style>
 
-    <div id="tabs">
-      <b class="widgetName">{{name}}</b>
-      <a id="viewTab" class="tab" on-click="{{showViewPane}}">View</a><a id="editTab" class="tab" on-click="{{showEditPane}}">Edit</a>
+    <div id="edit" on-mouseleave="{{showView}}">
+      <content select=".edit"></content>
     </div>
 
-    <div id="panels">
-      <div id="editPane">
-        <content select=".edit"></content>
-      </div>
-      <div id="viewPane">
-        <content select=".view"></content>
-      </div>
+    <div id="view" class="visible">
+      <content select=".view"></content>
+    </div>
+
+    <div id="modal" on-click="{{showEdit}}">
+      <button>Edit</button>
     </div>
 
   </template>
   <script>
     Polymer('ab-widget', {
 
-      removable: true,
-      name: 'Widget',
-
       ready: function() {
-        this.showViewPane();
+        this.asyncFire('showView');
       },
 
-      showEditPane: function() {
-        this.$.editPane.style.display = 'block';
-        this.$.viewPane.style.display = 'none';
-        this.$.editTab.classList.add('selected');
-        this.$.viewTab.classList.remove('selected');
-        this.fire('showEdit');
+      showEdit: function() {
+        this.$.edit.classList.add('visible');
+        this.$.view.classList.remove('visible');
+        this.asyncFire('showEdit');
       },
 
-      showViewPane: function() {
-        this.$.editPane.style.display = 'none';
-        this.$.viewPane.style.display = 'block';
-        this.$.editTab.classList.remove('selected');
-        this.$.viewTab.classList.add('selected');
-        this.fire('showView');
+      showView: function() {
+        this.$.view.classList.add('visible');
+        this.$.edit.classList.remove('visible');
+        this.asyncFire('showView');
       }
-
 
     });
   </script>
