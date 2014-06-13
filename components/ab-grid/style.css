@@ -1,0 +1,104 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+polyfill-next-selector { content: ':host > *'; }
+* ::content {
+
+  display: block;
+  position: absolute;
+
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+
+  -webkit-transition: top 250ms ease, left 250ms ease;
+  -moz-transition: top 250ms ease, left 250ms ease;
+  -ms-transition: top 250ms ease, left 250ms ease;
+  -o-transition: top 250ms ease, left 250ms ease;
+  transition: top 250ms ease, left 250ms ease;
+
+  z-index: 10;
+
+  overflow: auto;
+
+}
+
+polyfill-next-selector { content: ':host > .resizable:hover, :host > .removable:hover, :host > .moving'; }
+::content .resizable:hover, ::content > .removable:hover, ::content > .moving {
+  border: 3px solid rgba(0, 112, 255, 0.5);
+  padding-right: 20px;
+}
+
+
+polyfill-next-selector { content: ':host > .resizable:hover::after, :host > .resizable.moving::after'; }
+::content > .resizable:hover::after, ::content > .resizable.moving::after {
+  bottom: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  content: '';
+  display: block;
+  position: absolute;
+  border-bottom: 3px solid #ccc;
+  border-right: 3px solid #ccc;
+  cursor: se-resize;
+  pointer-events: none;
+}
+
+polyfill-next-selector { content: ':host > .removable:hover::before, :host > .removable.moving::before'; }
+::content > .removable:hover::before, ::content > .removable.moving::before {
+  content: '✕';
+  top: 2px;
+  right: 2px;
+  font-size: 18px;
+  display: block;
+  position: absolute;
+  color: #ccc;
+  font-weight: bold;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+polyfill-next-selector { content: ':host > *.moving'; }
+::content .moving {
+  opacity: 0.5;
+}
+
+#placeholder {
+
+  border: 3px dashed rgba(0, 112, 255, 0.5);
+  background-color: transparent;
+
+  -webkit-transition: width 250ms ease, height 250ms ease;
+  -moz-transition: width 250ms ease, height 250ms ease;
+  -ms-transition: width 250ms ease, height 250ms ease;
+  -o-transition: width 250ms ease, height 250ms ease;
+  transition: width 250ms ease, height 250ms ease;
+
+  z-index: 1;
+  display: none;
+
+}
+
+#placeholder::after, #placeholder::before {
+  border: none;
+  content: '';
+}
+
+polyfill-next-selector { content: ':host > [draggable]'; }
+::content [draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+}
+
+.dragged {
+  display: block;
+  background-color: #fff;
+}

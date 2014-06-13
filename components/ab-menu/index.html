@@ -2,14 +2,33 @@
 <polymer-element name="ab-menu">
   <template>
     <ab-filesystem id="fs"></ab-filesystem>
+
     <style type="text/css">
+
       :host {
         display: block;
       }
+
       .hidden {
         display: none;
       }
+
+      #title {
+        font-size: 26px;
+        font-family: 'monospace';
+        border-bottom: 1px dashed #ccc;
+      }
+
+      button {
+        display: block;
+        padding: 5px;
+        width: 100%;
+      }
+
     </style>
+
+    <h1 id="title">AppBuilder</h1>
+
     <button on-click="{{openApp}}" disabled?="{{!isNWContext}}">Open App</button>
     <button on-click="{{toggleView}}">Toggle "View" mode</button>
     <fieldset disabled?="{{!app}}">
@@ -22,6 +41,7 @@
       <input type="text" value="{{app.licence}}" />
     </fieldset>
     <button on-click="{{saveApp}}" disabled?="{{!app}}">Save App</button>
+
   </template>
   <script>
     Polymer('ab-menu', {
