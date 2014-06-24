@@ -16,10 +16,21 @@
   </head>
   <body unresolved>
 
-    <div id="container">
-      <ab-widgetslist id="widgets" class="block"></ab-widgetslist>
-      <ab-menu id="menu" class="block"></ab-menu>
-      <ab-workspace id="workspace" class="block"></ab-workspace>
+    <div class="page-wrap">
+
+      <section class="main-content">
+        <ab-workspace id="workspace"></ab-workspace>
+      </section>
+
+      <nav class="main-nav">
+        <h1 id="title">AppBuilder</h1>
+        <ab-menu id="menu"></ab-menu>
+      </nav>
+
+      <aside class="main-sidebar">
+        <ab-widgetslist id="widgets"></ab-widgetslist>
+      </aside>
+
     </div>
 
   </body>

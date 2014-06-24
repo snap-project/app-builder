@@ -13,12 +13,13 @@
       #grid {
         width: 100%;
         height: 100%;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAJElEQVQYV2O8e/duPQMaUFZWbkQXYxwKCtEdDeJjczfjEFAIADBCI3luyESPAAAAAElFTkSuQmCC) repeat;
       }
 
     </style>
 
     <polymer-signals on-polymer-signal-appchange="{{appChangedSignal}}"></polymer-signals>
-    <ab-grid id="grid" columns="5" rows="5"></ab-grid>
+    <ab-grid id="grid" columns="10" rows="10"></ab-grid>
 
   </template>
   <script>
@@ -47,7 +48,7 @@
       },
 
       widgetDragOver: function(evt) {
-        
+
         if(evt.dataTransfer.effectAllowed === 'copy') {
 
           if (evt.preventDefault) {
@@ -55,10 +56,10 @@
           }
 
           evt.dataTransfer.dropEffect = 'copy';
-          
+
           return false;
         }
-        
+
       },
 
       widgetDrop: function(evt) {

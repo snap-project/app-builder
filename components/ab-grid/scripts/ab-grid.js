@@ -17,6 +17,7 @@
 
     _resizedEl: null,
     _draggedEl: null,
+    _mouseDragOffset: null,
 
     domReady: function() {
       this._layout = new GridLayout(this.columns, this.rows);
@@ -158,16 +159,22 @@
     /* Drag & Drop */
 
     _dragStart: function(evt) {
+
       var el = evt.target;
       var gridId = this._layout.getElementId(el);
+
       if(!this.isResizing() && gridId) {
+
         var dataTransfer = evt.dataTransfer;
         dataTransfer.setData('application/x-ab-grid-id', gridId);
         dataTransfer.effectAllowed = 'move';
         this._draggedEl = el;
+        this._mouseDragOffset = this._getRelativeMousePos(evt, el);
+
         el.classList.add('moving');
         this._togglePlaceholder(false);
       }
+
     },
 
     _dragEnd: function(evt) {
@@ -194,7 +201,7 @@
         var rect = el.getBoundingClientRect();
         var id = this._layout.getElementId(el);
 
-        var grid = this.toGridSpace(pos.x, pos.y);
+        var grid = this.toGridSpace(pos.x - this._mouseDragOffset.x, pos.y - this._mouseDragOffset.y);
 
         this._updatePlaceholder({
           top: grid.row * cellSize.height + grid.row * this.gutter,

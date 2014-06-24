@@ -9,16 +9,6 @@
         display: block;
       }
 
-      .hidden {
-        display: none;
-      }
-
-      #title {
-        font-size: 26px;
-        font-family: 'monospace';
-        border-bottom: 1px dashed #ccc;
-      }
-
       button {
         display: block;
         padding: 5px;
@@ -27,10 +17,7 @@
 
     </style>
 
-    <h1 id="title">AppBuilder</h1>
-
     <button on-click="{{openApp}}" disabled?="{{!isNWContext}}">Open App</button>
-    <button on-click="{{toggleView}}">Toggle "View" mode</button>
     <fieldset disabled?="{{!app}}">
       <legend>App</legend>
       <label>Name</label>
@@ -68,16 +55,7 @@
       saveApp: function() {
         this.$.fs.saveApp(this.app);
         alert("App saved !");
-      },
-
-      toggleView: function() {
-        var viewOnly = document.body.hasAttribute('view-only');
-        if(viewOnly) {
-          document.body.removeAttribute('view-only');
-        } else {
-          document.body.setAttribute('view-only', true);
-        }
-      },
+      }
 
     });
   </script>

@@ -78,25 +78,20 @@ var GridLayout = (function() {
 
     this._unfill(rect);
 
-    var freed = this._free({
+    var dest = {
       top: rect.top,
       left: rect.left,
       width: toWidth,
       height: toHeight
-    }, [id]);
+    };
+
+    var freed = this._free(dest, [id]);
 
     if(freed) {
-      this._fill(id, {
-        top: rect.top,
-        left: rect.left,
-        width: toWidth,
-        height: toHeight
-      });
+      this._fill(id, dest);
     } else {
       this._fill(id, rect);
     }
-
-    this.compact();
 
     return freed;
 
@@ -124,8 +119,6 @@ var GridLayout = (function() {
     this._unfill(rect);
     this._free(dest);
     this._fill(id, dest);
-
-    this.compact();
 
   };
 
@@ -309,9 +302,7 @@ var GridLayout = (function() {
 
   };
 
-  p._free = function(rect, ignore) {
-
-    ignore = ignore || [];
+  p._free = function(rect) {
 
     var id;
     var collisions = this._getElementsInRect(rect);
@@ -319,11 +310,10 @@ var GridLayout = (function() {
 
     for(var i = 0, len = collisions.length; i < len; ++i) {
       id = collisions[i];
-      if(ignore.indexOf(id) === -1) {
-        moved = this._moveDown(id, rect.top + rect.height);
-        if(!moved) {
-          return false;
-        }
+      moved = this._moveUp(id, rect.top);
+      !moved && (moved = this._moveDown(id, rect.top + rect.height));
+      if(!moved) {
+        return false;
       }
     }
 
@@ -350,9 +340,13 @@ var GridLayout = (function() {
       }
     }
 
+    throw new Error('No space left !');
+
   };
 
   p._moveDown = function(id, toRow) {
+
+    console.log('_moveDown', id, toRow);
 
     var rect = this.getElementRect(id);
 
@@ -376,6 +370,37 @@ var GridLayout = (function() {
         width: rect.width,
         height: rect.height
       });
+    } else {
+      this._fill(id, rect);
+    }
+
+    return freed;
+
+  };
+
+  p._moveUp = function(id, fromRow) {
+
+    console.log('_moveUp', id, fromRow);
+
+    var rect = this.getElementRect(id);
+
+    if(fromRow - rect.height < 0) {
+      return false;
+    }
+
+    this._unfill(rect);
+
+    var dest = {
+      top: fromRow-rect.height,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height
+    };
+
+    var freed = this._free(dest, [id]);
+
+    if(freed) {
+      this._fill(id, dest);
     } else {
       this._fill(id, rect);
     }
