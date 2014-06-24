@@ -151,7 +151,7 @@
       if(this._inRemoveZone(el, pos.x, pos.y)) {
         this.removeChild(el);
         this._layout.remove(el);
-        this._layout.compact();
+        //this._layout.compact();
         this.render();
       }
     },
@@ -211,6 +211,7 @@
         });
 
         this._layout.move(id, grid.row, grid.column);
+        //this._layout.compact();
 
         this.render();
 
@@ -282,6 +283,7 @@
         var id = this._layout.getElementId(el);
 
         var resized = this._layout.resize(id, width, height);
+        //this._layout.compact();
 
         this.render();
 

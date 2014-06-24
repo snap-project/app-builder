@@ -117,8 +117,14 @@ var GridLayout = (function() {
     };
 
     this._unfill(rect);
-    this._free(dest);
-    this._fill(id, dest);
+    var freed = this._free(dest);
+    if(freed) {
+      this._fill(id, dest);
+    } else {
+      this._fill(id, rect);
+    }
+    
+    return freed;
 
   };
 
@@ -302,25 +308,6 @@ var GridLayout = (function() {
 
   };
 
-  p._free = function(rect) {
-
-    var id;
-    var collisions = this._getElementsInRect(rect);
-    var moved;
-
-    for(var i = 0, len = collisions.length; i < len; ++i) {
-      id = collisions[i];
-      moved = this._moveUp(id, rect.top);
-      !moved && (moved = this._moveDown(id, rect.top + rect.height));
-      if(!moved) {
-        return false;
-      }
-    }
-
-    return true;
-
-  };
-
   p._getInsertionPoint = function(width, height) {
 
     var isAvailable;
@@ -344,6 +331,26 @@ var GridLayout = (function() {
 
   };
 
+
+  p._free = function(rect) {
+
+    var id;
+    var collisions = this._getElementsInRect(rect);
+    var moved;
+
+    for(var i = 0, len = collisions.length; i < len; ++i) {
+      id = collisions[i];
+      moved = this._moveUp(id, rect.top);
+      !moved && (moved = this._moveDown(id, rect.top + rect.height));
+      if(!moved) {
+        return false;
+      }
+    }
+
+    return true;
+
+  };
+
   p._moveDown = function(id, toRow) {
 
     console.log('_moveDown', id, toRow);
@@ -354,24 +361,21 @@ var GridLayout = (function() {
       return false;
     }
 
-    this._unfill(rect);
-
     var freed = this._free({
       top: toRow,
       left: rect.left,
       width: rect.width,
       height: rect.height
-    }, [id]);
+    });
 
     if(freed) {
+      this._unfill(rect);
       this._fill(id, {
         top: toRow,
         left: rect.left,
         width: rect.width,
         height: rect.height
       });
-    } else {
-      this._fill(id, rect);
     }
 
     return freed;
@@ -388,7 +392,7 @@ var GridLayout = (function() {
       return false;
     }
 
-    this._unfill(rect);
+    //this._unfill(rect);
 
     var dest = {
       top: fromRow-rect.height,
@@ -397,15 +401,15 @@ var GridLayout = (function() {
       height: rect.height
     };
 
-    var freed = this._free(dest, [id]);
+    var collisions = this._getElementsInRect(dest);
 
-    if(freed) {
+    if(collisions.length === 0) {
+      this._unfill(rect);
       this._fill(id, dest);
-    } else {
-      this._fill(id, rect);
+      return true;
     }
 
-    return freed;
+    return false;
 
   };
 
