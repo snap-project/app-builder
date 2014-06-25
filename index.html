@@ -16,21 +16,25 @@
   </head>
   <body unresolved>
 
-    <div class="page-wrap">
+    <ab-workspace id="workspace"></ab-workspace>
 
-      <section class="main-content">
-        <ab-workspace id="workspace"></ab-workspace>
-      </section>
-
-      <nav class="main-nav">
+    <div id="settings" class="transition">
+      <div class="content">
         <h1 id="title">AppBuilder</h1>
-        <ab-menu id="menu"></ab-menu>
-      </nav>
+        <ab-menu></ab-menu>
+      </div>
+      <div class="tab">
+        Settings
+      </div>
+    </div>
 
-      <aside class="main-sidebar">
-        <ab-widgetslist id="widgets"></ab-widgetslist>
-      </aside>
-
+    <div id="widgets" class="transition">
+      <div class="content">
+        <ab-widgetslist></ab-widgetslist>
+      </div>
+      <a class="tab" onclick="location.hash = location.hash == '#widgets' ? '' : '#widgets'">
+        Widgets
+      </a>
     </div>
 
   </body>
