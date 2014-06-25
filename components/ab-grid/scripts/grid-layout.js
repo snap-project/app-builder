@@ -332,7 +332,9 @@ var GridLayout = (function() {
   };
 
 
-  p._free = function(rect) {
+  p._free = function(rect, ignore) {
+
+    ignore = ignore || [];
 
     var id;
     var collisions = this._getElementsInRect(rect);
@@ -340,11 +342,16 @@ var GridLayout = (function() {
 
     for(var i = 0, len = collisions.length; i < len; ++i) {
       id = collisions[i];
-      moved = this._moveUp(id, rect.top);
-      !moved && (moved = this._moveDown(id, rect.top + rect.height));
-      if(!moved) {
-        return false;
+      if(ignore.indexOf(id) === -1) {
+        moved = this._moveUp(id, rect.top);
+        if(!moved)  {
+          moved = this._moveDown(id, rect.top + rect.height)
+        }
+        if(!moved) {
+          return false;
+        }
       }
+      
     }
 
     return true;
@@ -352,8 +359,6 @@ var GridLayout = (function() {
   };
 
   p._moveDown = function(id, toRow) {
-
-    console.log('_moveDown', id, toRow);
 
     var rect = this.getElementRect(id);
 
@@ -366,7 +371,7 @@ var GridLayout = (function() {
       left: rect.left,
       width: rect.width,
       height: rect.height
-    });
+    }, [id]);
 
     if(freed) {
       this._unfill(rect);
@@ -383,8 +388,6 @@ var GridLayout = (function() {
   };
 
   p._moveUp = function(id, fromRow) {
-
-    console.log('_moveUp', id, fromRow);
 
     var rect = this.getElementRect(id);
 
