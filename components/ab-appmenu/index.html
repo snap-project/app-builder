@@ -1,5 +1,5 @@
 <link rel="import" href="../ab-filesystem/index.html">
-<polymer-element name="ab-menu">
+<polymer-element name="ab-appmenu">
   <template>
     <ab-filesystem id="fs"></ab-filesystem>
 
@@ -7,6 +7,7 @@
 
       :host {
         display: block;
+        overflow: auto;
       }
 
       button {
@@ -18,20 +19,11 @@
     </style>
 
     <button on-click="{{openApp}}" disabled?="{{!isNWContext}}">Open App</button>
-    <fieldset disabled?="{{!app}}">
-      <legend>App</legend>
-      <label>Name</label>
-      <input type="text" value="{{app.name}}" />
-      <label>Authors</label>
-      <input type="text" value="{{app.authors}}" />
-      <label>Licence</label>
-      <input type="text" value="{{app.licence}}" />
-    </fieldset>
     <button on-click="{{saveApp}}" disabled?="{{!app}}">Save App</button>
 
   </template>
   <script>
-    Polymer('ab-menu', {
+    Polymer('ab-appmenu', {
 
       app: null,
       isNWContext: false,

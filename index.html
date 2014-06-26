@@ -6,10 +6,12 @@
     <!-- Components -->
     <link rel="import" href="bower_components/polymer/polymer.html">
     <link rel="import" href="components/ab-filesystem/index.html">
-    <link rel="import" href="components/ab-menu/index.html">
     <link rel="import" href="components/ab-workspace/index.html">
     <link rel="import" href="components/ab-widgetslist/index.html">
     <link rel="import" href="components/ab-widget/index.html">
+    <link rel="import" href="components/ab-tabpanel/index.html">
+    <link rel="import" href="components/ab-appmenu/index.html">
+    <link rel="import" href="components/ab-appsettings/index.html">
     <!-- Widgets -->
     <link rel="import" href="widgets/widget-text/widget-text.html">
     <link rel="import" href="widgets/widget-timeline/widget-timeline.html">
@@ -17,25 +19,18 @@
   <body unresolved>
 
     <ab-workspace id="workspace"></ab-workspace>
+    
+    <ab-tabpanel id="start" label="Start">
+      <ab-appmenu></ab-appmenu>
+    </ab-tabpanel>
 
-    <div id="settings" class="transition">
-      <div class="content">
-        <h1 id="title">AppBuilder</h1>
-        <ab-menu></ab-menu>
-      </div>
-      <div class="tab">
-        Settings
-      </div>
-    </div>
+    <ab-tabpanel id="widgets" label="Widgets">
+      <ab-widgetslist></ab-widgetslist>
+    </ab-tabpanel>
 
-    <div id="widgets" class="transition">
-      <div class="content">
-        <ab-widgetslist></ab-widgetslist>
-      </div>
-      <a class="tab" onclick="location.hash = location.hash == '#widgets' ? '' : '#widgets'">
-        Widgets
-      </a>
-    </div>
+    <ab-tabpanel id="settings" label="Settings">
+      <ab-appsettings></ab-appsettings>
+    </ab-tabpanel>
 
   </body>
 

@@ -1,0 +1,78 @@
+<polymer-element name="ab-tabpanel" attributes="label" lightdom>
+  <template>
+    <style>
+
+      :host {
+
+        display: block;
+        position: relative;
+
+        min-height: 80px;
+
+        -webkit-transition: all 150ms ease-in-out;
+        -moz-transition: all 150ms ease-in-out;
+        -ms-transition: all 150ms ease-in-out;
+        -o-transition: all 150ms ease-in-out;
+        transition: all 150ms ease-in-out;
+
+        -webkit-box-shadow: 2px 3px 3px 0px rgba(0,0,0,0.3);
+        box-shadow: 2px 3px 3px 0px rgba(0,0,0,0.3);       
+
+      }
+
+      #tab {
+
+        display: block;
+
+        position: absolute;
+        right: -60px;
+        top: 20px;
+
+        height: 40px;
+        line-height: 40px;
+        width: 80px;
+
+        -moz-transform: rotate(90deg);
+        -webkit-transform: rotate(90deg);
+        -o-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+        transform: rotate(90deg);
+
+        cursor: pointer;
+        text-decoration: none;
+        font-style: bold;
+
+        text-align: center;
+        -webkit-border-radius: 10px 10px 0 0;
+        border-radius: 10px 10px 0 0;
+
+        -webkit-transition: all 150ms ease-in-out;
+        -moz-transition: all 150ms ease-in-out;
+        -ms-transition: all 150ms ease-in-out;
+        -o-transition: all 150ms ease-in-out;
+        transition: all 150ms ease-in-out;
+
+        -webkit-box-shadow: 3px -2px 3px 0 rgba(0,0,0,0.3);
+        box-shadow: 3px -2px 3px 0 rgba(0,0,0,0.3);
+
+      }
+
+    </style>
+
+    <content select="*"></content>
+    <div id="tab" on-click="{{toggleHash}}">{{label}}</div>
+  </template>
+  <script>
+    Polymer('ab-tabpanel', {
+      
+      label: '',
+
+      toggleHash: function() {
+        var current = window.location.hash;
+        var hash = '#' + this.id;
+        window.location.hash = current === hash ? '' : hash; 
+      }
+
+    });
+  </script>
+</polymer-element>

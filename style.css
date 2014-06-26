@@ -1,3 +1,8 @@
+/*
+  Color theme
+  http://www.colourlovers.com/palette/1641305/shiny_sky
+*/
+
 * {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -6,10 +11,11 @@
 
 html, body {
   font-family: 'Droid Sans', 'Ubuntu Sans', 'sans serif';
-  color: #333;
+  color: #444;
   margin: 0;
   height: 100%;
-  padding: 10px;
+  padding: 5px 5px 5px 25px;
+  background-color: #506C91;
 }
 
 
@@ -27,58 +33,54 @@ ab-grid > * {
   overflow: auto;
   width: 100%;
   height: 100%;
+  background-color: #FEFEFE;
 }
 
-#widgets, #settings {
+#widgets,
+#start,
+#settings {
   position: fixed;
   z-index: 10;
+  padding: 10px 5px 5px 50px;
+  background-color: #BDD6EA;
+}
+
+#widgets #tab,
+#start #tab,
+#settings #tab {
+  background-color: #BDD6EA;
+}
+
+#widgets:target,
+#start:target,
+#settings:target {
+  left: 0px;
+  background-color: #D5EDFF;
+}
+
+#widgets:target #tab,
+#start:target #tab,
+#settings:target #tab {
+  background-color: #D5EDFF;
+}
+
+
+
+#start {
+  left: -250px;
+  top: 20px;
+  width: 250px;
 }
 
 #widgets {
   left: -150px;
-  top: 20px;
+  top: 110px;
   width: 150px;
-  background-color: #A9DA88;
 }
 
-#widgets:target {
-  left: 0px;
-}
-
-#widgets .tab {
-
-  display: block;
-  background-color: #A9DA88;
-
-  position: absolute;
-  right: -60px;
-  top: 20px;
-
-  height: 40px;
-  line-height: 40px;
-  width: 80px;
-
-  -moz-transform: rotate(90deg);
-  -webkit-transform: rotate(90deg);
-  -o-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
-  transform: rotate(90deg);
-  
-  text-align: center;
-  -webkit-border-radius: 10px 10px 0 0;
-  border-radius: 10px 10px 0 0;
-  cursor: pointer;
-  text-decoration: none;
-  font-style: bold;
-}
-
-
-
-.transition {
-  -webkit-transition: all 250ms ease-in-out;
-  -moz-transition: all 250ms ease-in-out;
-  -ms-transition: all 250ms ease-in-out;
-  -o-transition: all 250ms ease-in-out;
-  transition: all 250ms ease-in-out;
+#settings {
+  left: -250px;
+  top: 200px;
+  width: 250px;
 }
 
