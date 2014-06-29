@@ -1,7 +1,7 @@
-<link rel="import" href="../ab-filesystem/index.html">
-<polymer-element name="ab-appmenu">
+<link rel="import" href="../ab-app-utils/ab-app-utils.html">
+<polymer-element name="ab-menu">
   <template>
-    <ab-filesystem id="fs"></ab-filesystem>
+    <ab-app-utils id="utils"></ab-app-utils>
 
     <style type="text/css">
 
@@ -23,18 +23,18 @@
 
   </template>
   <script>
-    Polymer('ab-appmenu', {
+    Polymer('ab-menu', {
 
       app: null,
       isNWContext: false,
 
       ready: function() {
-        this.isNWContext = this.$.fs.isNWContext();
+        this.isNWContext = this.$.utils.isNWContext();
       },
 
       openApp: function() {
         var self = this;
-        this.$.fs.openApp(function(app) {
+        this.$.utils.openApp(function(app) {
           if(app) {
             self.app = app;
             self.asyncFire('polymer-signal', {name: 'appchange', data: app});
@@ -45,7 +45,7 @@
       },
 
       saveApp: function() {
-        this.$.fs.saveApp(this.app);
+        this.$.utils.saveApp(this.app);
         alert("App saved !");
       }
 

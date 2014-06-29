@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer-signals/polymer-signals.html">
-<link rel="import" href="../ab-grid/index.html">
+<link rel="import" href="../ab-grid/ab-grid.html">
 <polymer-element name="ab-workspace"
   on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}">
   <template>
@@ -18,7 +18,7 @@
 
     </style>
 
-    <polymer-signals on-polymer-signal-appchange="{{appChangedSignal}}"></polymer-signals>
+    <polymer-signals on-polymer-signal-appchange="{{handleAppChange}}"></polymer-signals>
     <ab-grid id="grid" columns="10" rows="10"></ab-grid>
 
   </template>
@@ -27,24 +27,9 @@
 
       app: null,
 
-      appChangedSignal: function(evt, app) {
-        if(app.widgets) {
-          this.$.grid.innerHTML = '';
-          //this.buildWidgets(app.widgets, this.$.grid);
-        }
-      },
-
-      buildWidgets: function(node, container) {
-        var self = this;
-        var el = container || document.createElement(node.type);
-        el.options = node.options;
-        if(Array.isArray(node.children)) {
-          node.children.forEach(function(childNode) {
-            var childEl = self.buildWidgets(childNode);
-            el.appendChild(childEl);
-          });
-        }
-        return el;
+      handleAppChange: function(evt, app) {
+        app.grid = this.$.grid;
+        app.restoreGrid();
       },
 
       widgetDragOver: function(evt) {

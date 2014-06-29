@@ -1,0 +1,103 @@
+<polymer-element name="ab-tab-panel" attributes="label icon">
+  <template>
+    <style>
+
+      :host {
+
+        display: block;
+        position: relative;
+
+        min-height: 80px;
+
+        -webkit-transition: all 150ms ease-in-out;
+        -moz-transition: all 150ms ease-in-out;
+        -ms-transition: all 150ms ease-in-out;
+        -o-transition: all 150ms ease-in-out;
+        transition: all 150ms ease-in-out;
+
+        -webkit-box-shadow: 2px 3px 3px 0px rgba(0,0,0,0.3);
+        box-shadow: 2px 3px 3px 0px rgba(0,0,0,0.3);
+
+      }
+
+      #tab {
+
+        display: block;
+
+        position: absolute;
+        right: -40px;
+        top: 0;
+
+        height: 40px;
+        line-height: 40px;
+        padding: 0px 10px;
+
+        -moz-transform: rotate(90deg) translateX(100%);
+        -webkit-transform: rotate(90deg) translateX(100%);
+        -o-transform: rotate(90deg) translateX(100%);
+        -ms-transform: rotate(90deg) translateX(100%);
+        transform: rotate(90deg) translateX(100%);
+
+        -moz-transform-origin: 100% 0;
+        -webkit-transform-origin: 100% 0;
+
+        cursor: pointer;
+        text-decoration: none;
+        font-style: bold;
+
+        text-align: center;
+        -webkit-border-radius: 10px 10px 0 0;
+        border-radius: 10px 10px 0 0;
+
+        -webkit-transition: all 150ms ease-in-out;
+        -moz-transition: all 150ms ease-in-out;
+        -ms-transition: all 150ms ease-in-out;
+        -o-transition: all 150ms ease-in-out;
+        transition: all 150ms ease-in-out;
+
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+
+        -webkit-box-shadow: 3px -2px 3px 0 rgba(0,0,0,0.3);
+        box-shadow: 3px -2px 3px 0 rgba(0,0,0,0.3);
+
+      }
+
+    </style>
+
+    <div id="panel" style="min-height: {{minHeight}}px">
+      <content select="*"></content>
+    </div>
+    <div id="tab" on-click="{{toggleHash}}">{{label}} <i class="fa fa-{{icon}}"></i></div>
+  </template>
+  <script>
+    Polymer('ab-tab-panel', {
+
+      label: '',
+      minHeight: 0,
+
+      ready: function() {
+        this._updateMinHeight();
+        this._watchTabMutations();
+      },
+
+      toggleHash: function() {
+        var current = window.location.hash;
+        var hash = '#' + this.id;
+        window.location.hash = current === hash ? '' : hash;
+      },
+
+      _watchTabMutations: function() {
+        var observer = new MutationObserver(this._updateMinHeight.bind(this));
+        var config = {childList: true};
+        observer.observe(this.$.tab, config);
+      },
+
+      _updateMinHeight: function() {
+        this.minHeight = this.$.tab.getBoundingClientRect().height;
+      }
+
+    });
+  </script>
+</polymer-element>

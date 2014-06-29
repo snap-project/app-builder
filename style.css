@@ -73,14 +73,14 @@ ab-grid > * {
 }
 
 #widgets {
-  left: -150px;
-  top: 110px;
-  width: 150px;
+  left: -280px;
+  top: 105px;
+  width: 280px;
 }
 
 #settings {
   left: -250px;
-  top: 200px;
+  top: 214px;
   width: 250px;
 }
 

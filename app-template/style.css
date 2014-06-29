@@ -1,15 +1,10 @@
 
-/* Temporary, waiting for :ancestor() proper support in Polymer */
-ab-widget[view-only] > #tabs,
-*[view-only] ab-widget > #tabs {
-  display: none;
+html, body {
+  padding: 10px;
+  margin: 0;
 }
 
-*[view-only] ab-container, ab-container[view-only] {
-  border: none;
-}
-
-ab-widget[removable="false"] > #tabs > #removeButton,
-*[removable="false"] > ab-widget > #tabs > #removeButton {
-  display: none;
+#app {
+  width: 100%;
+  height: 100%;
 }

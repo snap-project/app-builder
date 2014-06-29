@@ -15,8 +15,9 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "~0.2.2",
+    "polymer": "~0.2.3",
     "polymer-signals": "Polymer/polymer-signals#~0.2.3",
-    "gridster": "*"
+    "font-awesome": "~4.1.0",
+    "polymer-ajax": "Polymer/polymer-ajax#~0.3.0"
   }
 }
