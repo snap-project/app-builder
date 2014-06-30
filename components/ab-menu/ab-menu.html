@@ -8,18 +8,50 @@
       :host {
         display: block;
         overflow: auto;
+        height: 50px;
       }
 
       button {
-        display: block;
-        padding: 5px;
-        width: 100%;
+        display: inline-block;
+        padding: 10px;
+        font-weight: bold;
+        border: none;
+        background-color: #BDD6EA;
+        color: #333;
+        vertical-align: super;
+      }
+
+      button:disabled {
+        background-color: #ccc;
+        color: #666;
+      }
+
+      #title {
+        display: inline-block;
+        margin: 0 20px 0 0;
+      }
+
+      #title span.builder {
+        color: #BDD6EA;
+      }
+
+      #title span.suffix {
+        font-size: 10px;
+        vertical-align: top;
+        color: #f7f7f7;
+      }
+
+      #appInfo {
+        vertical-align: middle;
       }
 
     </style>
 
-    <button on-click="{{openApp}}" disabled?="{{!isNWContext}}">Open App</button>
-    <button on-click="{{saveApp}}" disabled?="{{!app}}">Save App</button>
+    <h1 id="title">App<span class="builder">Builder</span><span class="suffix">alpha</span></h1>
+    <button on-click="{{openApp}}" disabled?="{{!isNWContext}}">Open <i class="fa fa-folder-open"></i></button>
+    <button on-click="{{saveApp}}" disabled?="{{!app}}">Save <i class="fa fa-save"></i></button>
+
+    <span id="appInfo">{{app.path}}</span>
 
   </template>
   <script>

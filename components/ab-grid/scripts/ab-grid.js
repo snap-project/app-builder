@@ -81,7 +81,7 @@
         el.style.left = rect.left * cellSize.width + rect.left * self.gutter;
         el.style.top = rect.top * cellSize.height + rect.top * self.gutter;
 
-        el.draggable = self.draggable;
+        el.draggable = self.movable;
         el.classList.toggle('resizable', self.resizable);
         el.classList.toggle('removable', self.removable);
 
