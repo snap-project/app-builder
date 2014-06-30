@@ -1,0 +1,31 @@
+<link rel="import" href="../../bower_components/polymer-ajax/polymer-ajax.html">
+<link rel="import" href="../ab-grid/ab-grid.html">
+<link rel="import" href="../ab-app-utils/ab-app-utils.html">
+<polymer-element name="ab-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #grid {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <polymer-ajax auto url="./manifest.json" on-polymer-response="{{handleResponse}}" handleAs="json"></polymer-ajax>
+    <ab-app-utils id="utils"></ab-app-utils>
+    <ab-grid id="grid" resizable="false" removable="false" movable="false"></ab-grid>
+  </template>
+  <script>
+   Polymer('ab-app', {
+
+      handleResponse: function(evt, ajax) {
+        var manifest = ajax.response;
+        var app = this.$.utils.getAppFromManifest(manifest);
+        app.grid = this.$.grid;
+        app.restoreGrid(false);
+      }
+
+   });
+  </script>
+</polymer-element>

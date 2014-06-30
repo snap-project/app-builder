@@ -25,8 +25,7 @@
 
       #modal button {
         border: none;
-        background-color: rgb(0, 112, 255);
-        border-radius: 10px;
+        background-color: #92B3D4;
         color: white;
         font-size: 14px;
         font-weight: bold;
@@ -39,9 +38,8 @@
         width: 50px;
       }
 
-      polyfill-next-selector { content: ':host > .visible'; }
-      ::content > .visible {
-        display: block !important;
+      #edit.visible, #view.visible {
+        display: block;
       }
 
       polyfill-next-selector { content: ':host(:hover) #modal'; }
@@ -54,6 +52,10 @@
         left: 0;
         right: 0;
         bottom: 0;
+      }
+
+      :host-context([editable="false"]) #modal {
+        display: none !important;
       }
 
       #edit.visible~#modal {
@@ -79,19 +81,19 @@
     Polymer('ab-widget', {
 
       ready: function() {
-        this.asyncFire('showView');
+        this.showView();
       },
 
       showEdit: function() {
         this.$.edit.classList.add('visible');
         this.$.view.classList.remove('visible');
-        this.asyncFire('showEdit');
+        this.asyncFire('widget-edit-state');
       },
 
       showView: function() {
         this.$.view.classList.add('visible');
         this.$.edit.classList.remove('visible');
-        this.asyncFire('showView');
+        this.asyncFire('widget-view-state');
       }
 
     });

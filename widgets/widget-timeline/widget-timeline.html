@@ -1,5 +1,6 @@
 <!-- Timeline Lib http://almende.github.io/chap-links-library/timeline.html -->
 <!-- Timeline example http://almende.github.io/chap-links-library/js/timeline/examples/example17_json_data.html -->
+<link rel="import" href="../../components/ab-widget/ab-widget.html">
 <polymer-element name="widget-timeline" attributes="options">
   <template>
     <link rel="stylesheet" type="text/css" href="vendor/timeline-2.6.1/timeline.css">
@@ -46,7 +47,7 @@
         };
         this.timeline = new links.Timeline(this.$.timeline);
         this.redraw();
-        this.addEventListener('showView', this.redraw.bind(this));
+        this.addEventListener('widget-show-state', this.redraw.bind(this));
       },
 
       redraw: function() {
@@ -70,6 +71,16 @@
           _end: null,
           content: ''
         });
+      },
+
+      optionsChanged: function(oldOpts, newOpts) {
+        if(newOpts && 'events' in newOpts) {
+          this.events = newOpts.events;
+        }
+        if(newOpts && 'timelineOpts' in newOpts) {
+          this.timelineOpts = newOpts.timelineOpts;
+        }
+        this.redraw();
       },
 
       exports: function() {

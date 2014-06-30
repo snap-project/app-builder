@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer-signals/polymer-signals.html">
-<link rel="import" href="../ab-grid/index.html">
+<link rel="import" href="../ab-grid/ab-grid.html">
 <polymer-element name="ab-workspace"
   on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}">
   <template>
@@ -7,18 +7,19 @@
     <style type="text/css">
 
       :host {
-        display: block;
+        display: -webkit-flex;
+        display: flex;
       }
 
       #grid {
-        width: 100%;
-        height: 100%;
+        flex: 1;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAJElEQVQYV2O8e/duPQMaUFZWbkQXYxwKCtEdDeJjczfjEFAIADBCI3luyESPAAAAAElFTkSuQmCC) repeat;
       }
 
     </style>
 
-    <polymer-signals on-polymer-signal-appchange="{{appChangedSignal}}"></polymer-signals>
-    <ab-grid id="grid" columns="5" rows="5"></ab-grid>
+    <polymer-signals on-polymer-signal-appchange="{{handleAppChange}}"></polymer-signals>
+    <ab-grid id="grid" columns="10" rows="10"></ab-grid>
 
   </template>
   <script>
@@ -26,28 +27,13 @@
 
       app: null,
 
-      appChangedSignal: function(evt, app) {
-        if(app.widgets) {
-          this.$.grid.innerHTML = '';
-          //this.buildWidgets(app.widgets, this.$.grid);
-        }
-      },
-
-      buildWidgets: function(node, container) {
-        var self = this;
-        var el = container || document.createElement(node.type);
-        el.options = node.options;
-        if(Array.isArray(node.children)) {
-          node.children.forEach(function(childNode) {
-            var childEl = self.buildWidgets(childNode);
-            el.appendChild(childEl);
-          });
-        }
-        return el;
+      handleAppChange: function(evt, app) {
+        app.grid = this.$.grid;
+        app.restoreGrid();
       },
 
       widgetDragOver: function(evt) {
-        
+
         if(evt.dataTransfer.effectAllowed === 'copy') {
 
           if (evt.preventDefault) {
@@ -55,10 +41,10 @@
           }
 
           evt.dataTransfer.dropEffect = 'copy';
-          
+
           return false;
         }
-        
+
       },
 
       widgetDrop: function(evt) {

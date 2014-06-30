@@ -11,12 +11,13 @@
     gutter: 15,
     resizable: true,
     removable: true,
-    draggable: true,
+    movable: true,
 
     _clickZoneSize: 20,
 
     _resizedEl: null,
     _draggedEl: null,
+    _mouseDragOffset: null,
 
     domReady: function() {
       this._layout = new GridLayout(this.columns, this.rows);
@@ -80,7 +81,7 @@
         el.style.left = rect.left * cellSize.width + rect.left * self.gutter;
         el.style.top = rect.top * cellSize.height + rect.top * self.gutter;
 
-        el.draggable = self.draggable;
+        el.draggable = self.movable;
         el.classList.toggle('resizable', self.resizable);
         el.classList.toggle('removable', self.removable);
 
@@ -114,12 +115,14 @@
       var self = this;
       var elements = self.$.content.getDistributedNodes();
       slice.call(elements).forEach(function(element) {
-        self._layout.insert(element, {
+        var rect = {
           top: +element.dataset.gridTop,
           left: +element.dataset.gridLeft,
           width: +element.dataset.gridWidth,
           height: +element.dataset.gridHeight
-        });
+        };
+        self._layout.insert(element, rect);
+        self.asyncFire('grid-element-insert', {element: element, rect: rect});
       });
     },
 
@@ -145,33 +148,42 @@
     /* Remove */
 
     _removeElement: function(evt) {
-      var pos = this._getRelativeMousePos(evt);
-      var el = evt.target;
-      if(this._inRemoveZone(el, pos.x, pos.y)) {
-        this.removeChild(el);
-        this._layout.remove(el);
-        this._layout.compact();
-        this.render();
+      if(this.removable) {
+        var pos = this._getRelativeMousePos(evt);
+        var el = evt.target;
+        if(this._inRemoveZone(el, pos.x, pos.y)) {
+          this.removeChild(el);
+          this._layout.remove(el);
+          this.asyncFire('grid-element-remove', {element: el});
+          //this._layout.compact();
+          this.render();
+        }
       }
     },
 
     /* Drag & Drop */
 
     _dragStart: function(evt) {
+
       var el = evt.target;
       var gridId = this._layout.getElementId(el);
-      if(!this.isResizing() && gridId) {
+
+      if(this.movable && !this.isResizing() && gridId) {
+
         var dataTransfer = evt.dataTransfer;
         dataTransfer.setData('application/x-ab-grid-id', gridId);
         dataTransfer.effectAllowed = 'move';
         this._draggedEl = el;
+        this._mouseDragOffset = this._getRelativeMousePos(evt, el);
+
         el.classList.add('moving');
         this._togglePlaceholder(false);
       }
+
     },
 
     _dragEnd: function(evt) {
-      if(this.isDragging()) {
+      if(this.movable && this.isDragging()) {
         this._draggedEl.classList.remove('moving');
         this._draggedEl = null;
         this.render();
@@ -180,7 +192,7 @@
 
     _dragOver: function(evt) {
 
-      if(this.isDragging()) {
+      if(this.movable && this.isDragging()) {
 
         if (evt.preventDefault) {
           evt.preventDefault();
@@ -194,7 +206,7 @@
         var rect = el.getBoundingClientRect();
         var id = this._layout.getElementId(el);
 
-        var grid = this.toGridSpace(pos.x, pos.y);
+        var grid = this.toGridSpace(pos.x - this._mouseDragOffset.x, pos.y - this._mouseDragOffset.y);
 
         this._updatePlaceholder({
           top: grid.row * cellSize.height + grid.row * this.gutter,
@@ -203,7 +215,11 @@
           height: rect.height
         });
 
-        this._layout.move(id, grid.row, grid.column);
+        var moved = this._layout.move(id, grid.row, grid.column);
+        if(moved) {
+          this.asyncFire('grid-element-move', {element: el, rect: this._layout.getElementRect(id)});
+        }
+        //this._layout.compact();
 
         this.render();
 
@@ -217,7 +233,7 @@
 
     _startResizing: function(evt) {
 
-      if(!this.isDragging()) {
+      if(this.resizable && !this.isDragging()) {
 
         var pos = this._getRelativeMousePos(evt);
 
@@ -242,7 +258,7 @@
 
     _stopResizing: function() {
 
-      if(this.isResizing()) {
+      if(this.resizable && this.isResizing()) {
 
         var el = this._resizedEl;
         var rect = el.getBoundingClientRect();
@@ -261,7 +277,7 @@
 
     _resize: function(evt) {
 
-      if(this.isResizing()) {
+      if(this.resizable && this.isResizing()) {
 
         var el = this._resizedEl;
         var left = +el.dataset.gridLeft;
@@ -275,6 +291,10 @@
         var id = this._layout.getElementId(el);
 
         var resized = this._layout.resize(id, width, height);
+        if(resized) {
+          this.asyncFire('grid-element-resize', {element: el, rect: this._layout.getElementRect(id)});
+        }
+        //this._layout.compact();
 
         this.render();
 

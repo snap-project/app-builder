@@ -2,25 +2,29 @@
   <head>
     <script src="bower_components/platform/platform.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" type="text/css" href="app-template/style.css">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
     <!-- Components -->
     <link rel="import" href="bower_components/polymer/polymer.html">
-    <link rel="import" href="components/ab-filesystem/index.html">
-    <link rel="import" href="components/ab-menu/index.html">
-    <link rel="import" href="components/ab-workspace/index.html">
-    <link rel="import" href="components/ab-widgetslist/index.html">
-    <link rel="import" href="components/ab-widget/index.html">
+    <link rel="import" href="components/index.html">
     <!-- Widgets -->
-    <link rel="import" href="widgets/widget-text/widget-text.html">
-    <link rel="import" href="widgets/widget-timeline/widget-timeline.html">
+    <link rel="import" href="widgets/index.html">
   </head>
   <body unresolved>
 
-    <div id="container">
-      <ab-widgetslist id="widgets" class="block"></ab-widgetslist>
-      <ab-menu id="menu" class="block"></ab-menu>
-      <ab-workspace id="workspace" class="block"></ab-workspace>
-    </div>
+    <ab-menu id="menu"></ab-menu>
+    <ab-workspace id="workspace"></ab-workspace>
+
+    <ab-tab-panel id="widgets" label="Widgets" icon="puzzle-piece">
+      <ab-widgets-list>
+        <ab-widget-item name="Text" tag="widget-text"></ab-widget-item>
+        <ab-widget-item name="Timeline" tag="widget-timeline"></ab-widget-item>
+      </ab-widgets-list>
+    </ab-tab-panel>
+
+    <ab-tab-panel id="settings" label="Settings" icon="gear">
+      <ab-settings></ab-settings>
+    </ab-tab-panel>
 
   </body>
 

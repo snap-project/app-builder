@@ -27,7 +27,7 @@ polyfill-next-selector { content: ':host > *'; }
 
 polyfill-next-selector { content: ':host > .resizable:hover, :host > .removable:hover, :host > .moving'; }
 ::content .resizable:hover, ::content > .removable:hover, ::content > .moving {
-  border: 3px solid rgba(0, 112, 255, 0.5);
+  border: 3px solid #92B3D4;
   padding-right: 20px;
 }
 
@@ -68,7 +68,7 @@ polyfill-next-selector { content: ':host > *.moving'; }
 
 #placeholder {
 
-  border: 3px dashed rgba(0, 112, 255, 0.5);
+  border: 3px dashed #92B3D4;
   background-color: transparent;
 
   -webkit-transition: width 250ms ease, height 250ms ease;
