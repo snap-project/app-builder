@@ -43,20 +43,25 @@
     };
 
     p.restoreGrid = function(editable) {
-      var grid = this.grid;
-      grid.columns = this.snapshot.columns;
-      grid.rows = this.snapshot.rows;
-      grid.innerHTML = '';
-      this.snapshot.widgets.forEach(function(widget) {
-        var el = document.createElement(widget.tag);
-        el.dataset.gridLeft = widget.rect.left;
-        el.dataset.gridTop = widget.rect.top;
-        el.dataset.gridWidth = widget.rect.width;
-        el.dataset.gridHeight = widget.rect.height;
-        el.setAttribute('editable', editable);
-        el.options = widget.options;
-        grid.appendChild(el);
-      });
+      if(this.snapshot) {
+        var grid = this.grid;
+        grid.columns = this.snapshot.columns;
+        grid.rows = this.snapshot.rows;
+        grid.innerHTML = '';
+        this.snapshot.widgets.forEach(function(widget) {
+          var el = document.createElement(widget.tag);
+          el.dataset.gridLeft = widget.rect.left;
+          el.dataset.gridTop = widget.rect.top;
+          el.dataset.gridWidth = widget.rect.width;
+          el.dataset.gridHeight = widget.rect.height;
+          el.setAttribute('editable', editable);
+          el.options = widget.options;
+          grid.appendChild(el);
+        });
+        return true;
+      } else {
+        return false;
+      }
     };
 
     p.snapshotGrid = function() {

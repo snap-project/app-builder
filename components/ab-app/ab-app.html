@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer-ajax/polymer-ajax.html">
 <link rel="import" href="../ab-grid/ab-grid.html">
 <link rel="import" href="../ab-app-utils/ab-app-utils.html">
-<polymer-element name="ab-app">
+<polymer-element name="ab-app" attributes="manifestUrl">
   <template>
     <style>
       :host {
@@ -12,7 +12,9 @@
         height: 100%;
       }
     </style>
-    <polymer-ajax auto url="./manifest.json" on-polymer-response="{{handleResponse}}" handleAs="json"></polymer-ajax>
+    <polymer-ajax auto url="{{manifestUrl}}" 
+      on-polymer-response="{{handleResponse}}" handleAs="json">
+    </polymer-ajax>
     <ab-app-utils id="utils"></ab-app-utils>
     <ab-grid id="grid" resizable="false" removable="false" movable="false"></ab-grid>
   </template>
