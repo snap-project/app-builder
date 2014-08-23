@@ -13,13 +13,15 @@
 
       #grid {
         flex: 1;
-        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAJElEQVQYV2O8e/duPQMaUFZWbkQXYxwKCtEdDeJjczfjEFAIADBCI3luyESPAAAAAElFTkSuQmCC) repeat;
+        background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAJElEQVQYV2O8e/duPQMaUFZWbkQXYxwKCtEdDeJjczfjEFAIADBCI3luyESPAAAAAElFTkSuQmCC) repeat repeat;
       }
 
     </style>
 
     <polymer-signals on-polymer-signal-appchange="{{handleAppChange}}"></polymer-signals>
-    <ab-grid id="grid" columns="10" rows="10"></ab-grid>
+    <ab-grid id="grid" columns="10" rows="10">
+      <widget-text></widget-text>
+    </ab-grid>
 
   </template>
   <script>

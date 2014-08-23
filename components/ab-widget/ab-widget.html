@@ -1,4 +1,4 @@
-<polymer-element name="ab-widget" attributes="options" on-mouseenter="{{showView}}">
+<polymer-element name="ab-widget" attributes="options">
   <template>
     <style>
 
@@ -13,87 +13,69 @@
         position: relative;
       }
 
-      polyfill-next-selector { content: ':host > *'; }
-      * ::content {
-        display: none;
-      }
-
-      #modal {
-        background-color: #fff;
-        opacity: 0.5;
-      }
-
-      #modal button {
-        border: none;
-        background-color: #92B3D4;
-        color: white;
-        font-size: 14px;
-        font-weight: bold;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-left: -20px;
-        margin-top: -15px;
-        height: 30px;
-        width: 50px;
-      }
-
-      #edit.visible, #view.visible {
-        display: block;
-      }
-
-      polyfill-next-selector { content: ':host(:hover) #modal'; }
-      :host(:hover) #modal {
-        display: block;
+      #edit, #view {
         width: 100%;
         height: 100%;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      #edit {
+        -webkit-transition: all 250ms ease;
+        -moz-transition: all 250ms ease;
+        -ms-transition: all 250ms ease;
+        -o-transition: all 250ms ease;
+        transition: all 250ms ease;
         position: absolute;
-        top: 0;
+        top: -100%;
         left: 0;
+        z-index: 10;
+        padding: 10px;
+        background-color: #BDD6EA;
+      }
+
+      #edit-tab {
+        position: absolute;
+        top: 100%;
         right: 0;
-        bottom: 0;
+        display: block;
+        background-color: #BDD6EA;
+        padding: 4px 9px;
+        cursor: pointer;
       }
 
-      :host-context([editable="false"]) #modal {
-        display: none !important;
-      }
-
-      #edit.visible~#modal {
-        display: none !important;
+      #edit.visible {
+        top: 0;
+        height: 90%;
       }
 
     </style>
 
-    <div id="edit" on-mouseleave="{{showView}}">
-      <content select=".edit"></content>
-    </div>
 
-    <div id="view" class="visible">
+    <div id="view">
       <content select=".view"></content>
     </div>
-
-    <div id="modal" on-click="{{showEdit}}">
-      <button>Edit</button>
+    <div id="edit">
+      <content select=".edit"></content>
+      <div id="edit-tab" on-click="{{ toggleEdit }}">Edit</div>
     </div>
 
   </template>
   <script>
     Polymer('ab-widget', {
 
-      ready: function() {
-        this.showView();
-      },
+      toggleEdit: function(toggle) {
 
-      showEdit: function() {
-        this.$.edit.classList.add('visible');
-        this.$.view.classList.remove('visible');
-        this.asyncFire('widget-edit-state');
-      },
+        toggle = !this.$.edit.classList.contains('visible');
 
-      showView: function() {
-        this.$.view.classList.add('visible');
-        this.$.edit.classList.remove('visible');
-        this.asyncFire('widget-view-state');
+        if(toggle) {
+          this.$.edit.classList.add('visible');
+          this.asyncFire('widget-edit-show');
+        } else {
+          this.$.edit.classList.remove('visible');
+          this.asyncFire('widget-edit-hide');
+        }
       }
 
     });
