@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer-signals/polymer-signals.html">
+<link rel="import" href="../../bower_components/core-signals/core-signals.html">
 <link rel="import" href="../ab-grid/ab-grid.html">
 <polymer-element name="ab-workspace"
   on-dragover="{{widgetDragOver}}" on-drop="{{widgetDrop}}">
@@ -18,10 +18,8 @@
 
     </style>
 
-    <polymer-signals on-polymer-signal-appchange="{{handleAppChange}}"></polymer-signals>
-    <ab-grid id="grid" columns="10" rows="10">
-      <widget-text></widget-text>
-    </ab-grid>
+    <core-signals on-core-signal-appchange="{{handleAppChange}}"></core-signals>
+    <ab-grid id="grid" columns="10" rows="10"></ab-grid>
 
   </template>
   <script>

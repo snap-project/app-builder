@@ -1,0 +1,44 @@
+<link rel="import" href="../../components/ab-widget/ab-widget.html">
+<link rel="import" href="../../components/ab-library/ab-library.html">
+<polymer-element name="widget-media-gallery" attributes="options">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      polyfill-next-selector { content: ':host #library'; }
+      ::content #library {
+        width: 100%;
+      }
+    </style>
+    <ab-widget name="Media Gallery">
+      <div class="edit">
+        <ab-library id="lib" filters="image,video"
+          on-ab-library-file-selected="{{handleFileSelect}}">
+        </ab-library>
+      </div>
+      <div class="view">
+        <ul>
+          <template repeat="{{f in _selected}}">
+            <li>
+              <img src="{{f.path}}" />
+            </li>
+          </template>
+        </ul>
+      </div>
+    </ab-widget>
+  </template>
+  <script>
+    Polymer({
+
+      ready: function() {
+        
+      },
+
+      handleFileSelect: function() {
+        this._selected = this.$.lib.getSelectedFiles();
+      }
+
+    });
+  </script>
+</polymer-element>

@@ -1,0 +1,220 @@
+<link rel="import" href="../../bower_components/core-signals/core-signals.html">
+<polymer-element name="ab-library" attributes="filters">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #files, #no-files {
+        width: 100%;
+        height: 100%;
+        text-align: center;
+      }
+      #files .border-right {
+        border-right: 1px solid #ccc;
+      }
+      #files .heading {
+        border-bottom: 1px solid #ccc;
+      }
+    </style>
+    <core-signals id="signals"
+      on-core-signal-ab-library-broadcast="{{handleAbLibraryBroadcast}}"></core-signals>
+    <span>Filters: {{filters}}</span>
+    <template if="{{getFiles().length > 0}}">
+      <table id="files">
+        <thead class="heading">
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template repeat="{{f in getFiles()}}">
+            <tr>
+              <td class="border-right"><input type="checkbox" checked="{{_selected[f.name]}}"/></td>
+              <td class="border-right">{{f.name}}</td>
+              <td class="border-right"><span class="fa fa-{{getTypeIcon(f.type)}}" title="{{f.type}}"></span></td>
+              <td>
+                <a target="_blank" download="{{f.name}}" href="{{f.path}}">Open</a>
+                <a href onclick="javascript:return false;"
+                  data-file-name="{{f.name}}"
+                  on-click="{{handleFileRemove}}">
+                  Remove
+                </a>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+    <template if="{{getFiles().length == 0}}">
+      <div id="no-files">
+        <h3>Drag files here</h3>
+      </div>
+    </template>
+  </template>
+  <script>
+    (function() {
+
+      var _library = [];
+
+      Polymer({
+
+        filters: '',
+
+        EVENTS: {
+          FILE_ADDED: 'ab-library-file-added',
+          FILE_REMOVED: 'ab-library-file-removed',
+          FILE_SELECTED: 'ab-library-file-selected',
+          FILE_UNSELECTED: 'ab-library-file-unselected'
+        },
+
+        created: function() {
+          this._selected = {};
+          this._filtered = [];
+        },
+
+        ready: function() {
+          this.addEventListener('dragover', this.handleFileDragOver.bind(this), false);
+          this.addEventListener('drop', this.handleFileDrop.bind(this), false);
+        },
+
+        handleFileDragOver: function(evt) {
+          if(evt.dataTransfer.files) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy';
+          }
+        },
+
+        handleFileDrop: function(evt) {
+          evt.stopPropagation();
+          evt.preventDefault();
+          var files = evt.dataTransfer.files;
+          var reader;
+          for(var i = 0, f; f = files[i]; i++) {
+            reader = new FileReader();
+            reader.onload = this.handleFileRead.bind(this, reader, f);
+            reader.readAsDataURL(f);
+          }
+        },
+
+        handleFileRead: function(reader, file, evt) {
+          reader.onload = null;
+          var file = this.addFile(file.name, file.type, evt.target.result);
+        },
+
+        handleFileRemove: function(evt, detail, sender) {
+          var fileName = sender.dataset.fileName;
+          this.removeFile(fileName);
+        },
+
+        addFile: function(fileName, type, dataUrl) {
+
+          var count = 0;
+          var nameParts = fileName.split('.');
+          var baseName = nameParts.length > 1 ?  nameParts.slice(0, -1) : fileName;
+          var ext = nameParts.length > 1 ? nameParts[nameParts.length-1] : '';
+          var nameRegex = new RegExp( '^' + baseName  + '(_\\d*)*' + (ext ? ( '\\.' + ext) : '') );
+
+          for(var i = 0, f; f = _library[i]; i++) {
+            if(nameRegex.test(f.name)) {
+              count++;
+            }
+          }
+
+          var newFile = {
+            name: baseName + (count ? ('_' + count) : '') + (ext ? ('.' + ext) : ''),
+            type: type,
+            path: dataUrl
+          };
+
+          this.broadcast(this.EVENTS.FILE_ADDED, newFile);
+
+          _library.push(newFile);
+          this._filtered.push(newFile);
+          Platform.flush();
+
+          return newFile;
+
+        },
+
+        removeFile: function(name) {
+          for(var i = 0, f; f = _library[i]; i++) {
+            if(name == f.name) {
+              _library.splice(i, 1);
+              delete this._selected[name];
+              this.broadcast(this.EVENTS.FILE_REMOVED, f);
+            }
+          }
+        },
+
+        setFiles: function(files) {
+          _library = files;
+        },
+
+        getFiles: function(ignoreFilters) {
+          var match, index;
+          var filters = (this.filters || '').split(',');
+          for(var i = 0, f; f = _library[i]; ++i) {
+            match = ignoreFilters || filters.some(function(filter) {
+              return !filter || filter.indexOf(f.type) !== -1;
+            });
+            index = this._filtered.indexOf(f);
+            if(match && index === -1) {
+              this._filtered.push(f);
+            } else if(!match && index !== -1) {
+              this._filtered.splice(index, 1);
+            }
+          }
+          return this._filtered;
+        },
+
+        getSelectedFiles: function() {
+          var self = this;
+          return self.getFiles().filter(function(f) {
+            return self._selected[f.name];
+          });
+        },
+
+        getTypeIcon: function(mimeType) {
+          if(~mimeType.indexOf('image')) {
+            return 'file-image-o';
+          } else if(~mimeType.indexOf('video')) {
+            return 'file-video-o';
+          } else if(~mimeType.indexOf('audio')) {
+            return 'file-audio-o';
+          } else if(~mimeType.indexOf('pdf')) {
+            return 'file-pdf-o';
+          } else if(~mimeType.indexOf('text')) {
+            return 'file-text-o';
+          } else {
+            return 'file-o';
+          }
+        },
+
+        broadcast: function(name, data) {
+          this.asyncFire(name, data);
+          this.asyncFire('core-signal', {
+            name: 'ab-library-broadcast',
+            data: {
+              name: name,
+              origin: this,
+              payload: data
+            }
+          });
+        },
+
+        handleAbLibraryBroadcast: function(evt, data) {
+          if(data.origin !== this) {
+            this.asyncFire(data.name, data.payload);
+          }
+        }
+
+      });
+
+    }());
+  </script>
+</polymer-element>
