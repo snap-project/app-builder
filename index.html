@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>AppBuilder</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="bower_components/angular-gridster/dist/angular-gridster.min.css" />
+  </head>
+  <body ng-app="AppBuilder" ng-cloak>
+    <ng-view></ng-view>
+    <script src="bower_components/es6-module-loader/dist/es6-module-loader.js"></script>
+    <script src="bower_components/system.js/dist/system.js"></script>
+    <script>
+      /* globals System */
+      System.config({
+        baseURL: 'bower_components',
+        paths: {
+          'js/*': '../js/*.js'
+        },
+        map: {
+          angular: 'angular/angular.min',
+          text: 'plugin-text/text'
+        }
+      });
+      System.import('js/app');
+    </script>
+  </body>
+</html>

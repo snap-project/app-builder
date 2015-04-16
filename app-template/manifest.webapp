@@ -1,0 +1,14 @@
+{
+  "name": "MyApp",
+  "appBuilder": {
+    "resources": {
+      
+    },
+    "pages": {
+      "page1": [
+        { "title": "Test Widget", "type": "my-widget", "data": {}, "tile": {"row": 0, "col": 0, "sizeX": 1, "sizeY": 1} },
+        { "title": "Test Widget2", "type": "my-widget", "data": { "foo": "bar" }, "tile": {"row": 0, "col": 1, "sizeX": 1, "sizeY": 1} }
+      ]
+    }
+  }
+}
