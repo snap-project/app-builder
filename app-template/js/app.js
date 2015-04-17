@@ -1,111 +1,82 @@
-/* jshint browser:true */
-/* globals angular, console */
-angular.module('ABApp', ['ngRoute', 'gridster'])
-  .config(['$routeProvider', function($routeProvider) {
+/* jshint node:true */
 
-    $routeProvider
-      .when('/:pageId?', {
-        template: '<ab-page page="pageId" grid-opts="gridOpts"></ab-page>',
-        controller: 'PageController'
-      })
-      .otherwise('/')
-    ;
+var angular = require('angular');
 
-  }])
-  .directive('abPage', [
-    '$compile', '$http',
-    function($compile, $http) {
-      return {
-        restrict: 'E',
-        scope: {
-          'pageId': '=page',
-          'gridOpts': '=gridOpts'
-        },
-        link: function(scope, element) {
+// Application dependencies
+require('angular-gridster/dist/angular-gridster.min');
+require('angular-route/angular-route');
 
-          var pageId = scope.pageId;
+angular.module('AppBuilder', ['ngRoute', 'gridster']);
 
-          $http.get('../manifest.webapp')
-            .success(function(manifest) {
-              var page = manifest.appBuilder.pages[pageId];
-              var grid = createGrid(page);
-              element.append(grid);
-            })
-            .error(function(err) {
-              console.error(err);
-            })
-          ;
+angular.module('AppBuilder')
+  .config([
+    '$routeProvider',
+    function($routeProvider) {
 
-          function createGrid(page) {
+      $routeProvider
+        .when('/:pageId?', {
+          template: require('./templates/page.html!text')
+        })
+        .otherwise('/')
+      ;
 
-            var tpl = $compile(
-              '<div gridster="gridsterOpts">' +
-                '<ul>' +
-                  '<li gridster-item="widget.tile" ng-repeat="widget in page">' +
-                    '<ab-widget widget-type="widget.type" widget-data="widget.data"></ab-widget>' +
-                  '</li>' +
-                '</ul>' +
-              '</div>'
-            );
-
-            var gridScope = scope.$new(true);
-
-            gridScope.gridsterOpts = scope.gridOpts;
-            gridScope.page = page;
-
-            console.log(gridScope);
-
-            return tpl(gridScope);
-
-          }
-
-
-        }
-      };
     }
   ])
-  .directive('abWidget', [
-    '$compile',
-    function($compile) {
-      return {
-        restrict: 'E',
-        scope: {
-          'data': '=widgetData',
-          'type': '=widgetType'
-        },
-        link: function(scope, element) {
-          var tpl = $compile('<'+scope.type+' widget-data="data"></'+scope.type+'>');
-          var el = tpl(scope);
-          element.append(el);
-        }
-      };
+  .controller('MainCtrl', [
+    '$scope', 'AppHelpers',
+    function($scope, AppHelpers) {
+
+      $scope.appTitle = '';
+      $scope.manifest = null;
+
+      AppHelpers.loadAppManifest()
+        .success(function(manifest) {
+          $scope.manifest = manifest;
+        })
+        .error(function(err) {
+          console.error(err);
+        })
+      ;
+
     }
   ])
-  .directive('myWidget', function() {
-      return {
-        restrict: 'E',
-        template: '<p>Hello {{data.foo}} !</p>',
-        scope: {
-          'data': '=widgetData',
-        }
-      };
-    }
-  )
-  .controller('PageController', [
-    '$routeParams', '$scope',
-    function($routeParams, $scope) {
+  .controller('PageCtrl', [
+    '$scope', '$routeParams',
+    function($scope, $routeParams) {
 
-      $scope.pageId = $routeParams.pageId;
+      $scope.currentPage = [];
 
       $scope.gridOpts = {
-        resizable: {
+        draggable: {
           enabled: false
         },
-        draggable: {
+        resizable: {
           enabled: false
         }
       };
+
+      $scope.$watch('manifest', function(manifest) {
+
+        if(!manifest) return;
+
+        var appBuilder = manifest.appBuilder;
+        var pages = Object.keys(appBuilder.pages);
+        var page = appBuilder.pages[$routeParams.pageId];
+
+        if(!page) {
+          page = appBuilder.pages[Object.keys(appBuilder.pages)[0]];
+        }
+
+        if(!page) return;
+
+        $scope.currentPage = page;
+
+      });
 
     }
   ])
 ;
+
+require('./services/index');
+require('./directives/index');
+require('./widgets/index');

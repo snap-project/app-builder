@@ -1,0 +1,10 @@
+<div gridster="gridsterOpts">
+  <ul>
+    <li gridster-item="widget.tile" ng-repeat="widget in page">
+      <ab-widget-container ng-click="dispatchWidgetFocus(widget)"
+        widget-title="widget.title" widget-type="widget.type"
+        widget-data="widget.data">
+      </ab-widget-container>
+    </li>
+  </ul>
+</div>

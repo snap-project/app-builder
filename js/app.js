@@ -15,7 +15,7 @@ angular.module('AppBuilder')
 
       $routeProvider
         .when('/', {
-          template: require('./templates/workspace.html!text')
+          template: require('./templates/layout.html!text')
         })
         .otherwise('/')
       ;

@@ -11,9 +11,10 @@ angular.module('AppBuilder')
         return $http.get(url);
       };
 
-      this.saveAppManifest = function(manifest, appDir) {
-        var url = (appDir ? appDir  : '.') + '/manifest.webapp';
-        // TODO
+      this.saveApp = function(appDir, pages) {
+
+        
+
       };
 
     }

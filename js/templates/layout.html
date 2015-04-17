@@ -1,0 +1,16 @@
+
+<ng-include src="'js/templates/_navbar.html'"></ng-include>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2">
+      <ng-include src="'js/templates/_widgets-list.html'"></ng-include>
+    </div>
+    <div class="col-md-8" ng-controller="WorkspaceCtrl" ab-drop>
+      <ab-page grid-opts="gridOpts" page="currentPage"></ab-page>
+    </div>
+    <div class="col-md-2">
+      <ng-include src="'js/templates/_widget-config.html'"></ng-include>
+    </div>
+  </div>
+</div>

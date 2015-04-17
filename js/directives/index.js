@@ -1,3 +1,4 @@
 /* jshint node:true */
-require('./ab-page');
-require('./ab-widget-container');
+require('./ab-page/index');
+require('./ab-drag-drop');
+require('./ab-compile');

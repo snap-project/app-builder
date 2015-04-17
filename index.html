@@ -1,11 +1,11 @@
-<html>
+<html ng-app="AppBuilder" ng-cloak ng-controller="MainCtrl">
   <head>
-    <title>AppBuilder</title>
+    <title ng-bind="appTitle"></title>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="bower_components/angular-gridster/dist/angular-gridster.min.css" />
   </head>
-  <body ng-app="AppBuilder" ng-cloak>
+  <body>
     <ng-view></ng-view>
     <script src="bower_components/es6-module-loader/dist/es6-module-loader.js"></script>
     <script src="bower_components/system.js/dist/system.js"></script>
