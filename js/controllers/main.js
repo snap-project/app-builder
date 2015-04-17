@@ -3,9 +3,15 @@ var angular = require('angular');
 
 angular.module('AppBuilder')
   .controller('MainCtrl', [
-    '$scope',
-    function($scope) {
+    '$scope', 'AppHelpers',
+    function($scope, AppHelpers) {
+
       $scope.appTitle = 'AppBuilder';
+
+      $scope.saveApp = function() {
+        AppHelpers.saveApp({});
+      };
+
     }
   ])
 ;
