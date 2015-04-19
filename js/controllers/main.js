@@ -9,7 +9,11 @@ angular.module('AppBuilder')
       $scope.appTitle = 'AppBuilder';
 
       $scope.saveApp = function() {
-        AppHelpers.saveApp({});
+        AppHelpers.saveApp();
+      };
+
+      $scope.openApp = function() {
+        AppHelpers.openApp();
       };
 
     }

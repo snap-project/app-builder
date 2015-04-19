@@ -3,8 +3,8 @@ var angular = require('angular');
 
 angular.module('AppBuilder')
   .controller('WorkspaceCtrl', [
-    '$scope', '$timeout', 'WidgetsRegistry',
-    function($scope, $timeout, WidgetsRegistry) {
+    '$scope', '$timeout', 'WidgetsRegistry', 'AppHelpers',
+    function($scope, $timeout, WidgetsRegistry, AppHelpers) {
 
       $scope.gridOpts = {
         draggable: {
@@ -13,17 +13,30 @@ angular.module('AppBuilder')
         }
       };
 
-      $scope.currentPage = [
-        { title: 'Test Widget', type: 'hello-world-widget', data: {}, tile: {row: 0, col: 0, sizeX: 1, sizeY: 2} },
-        { title: 'Test Widget2', type: 'hello-world-widget', data: { world: 'bar' }, tile: {row: 0, col: 1, sizeX: 3, sizeY: 1} }
-      ];
+      $scope.currentApp = AppHelpers.getCurrentApp();
+      $scope.currentPage = null;
+
+      $scope.$watch('currentApp.pages', function(pages) {
+
+        if(!pages) return;
+
+        var pagesIds = Object.keys(pages);
+
+        if(pagesIds.length === 0) {
+          pages['page-1'] = [];
+          $scope.currentPage = 'page-1';
+        } else {
+          $scope.currentPage = pagesIds[0];
+        }
+
+      });
 
       $scope.$on('abDrop', function(evt, data) {
 
         var widget = WidgetsRegistry.createWidgetForTag(data.model.tag);
 
         $timeout(function() {
-          $scope.currentPage.push(widget);
+          $scope.currentApp.pages[$scope.currentPage].push(widget);
         });
 
       });

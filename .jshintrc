@@ -4,11 +4,10 @@
   "undef": true,
   "quotmark": "single",
   "trailing": true,
-  "curly": true,
+  "curly": false,
   "newcap": true,
   "unused": true,
   "trailing": true,
-  "latedef" : true,
   "maxparams": 4,
   "maxcomplexity": 10,
   "maxerr": 1
