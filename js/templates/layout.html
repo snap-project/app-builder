@@ -4,7 +4,14 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-2">
-      <ng-include src="'js/templates/_widgets-list.html'"></ng-include>
+      <ab-tabs-container>
+        <ab-tab label="Widgets">
+          <ng-include src="'js/templates/_widgets-list.html'"></ng-include>
+        </ab-tab>
+        <ab-tab label="Resources">
+          <p>Resources</p>
+        </ab-tab>
+      </ab-tabs-container>
     </div>
     <div class="col-md-8" ng-controller="WorkspaceCtrl" ab-drop>
       <ab-page ng-if="currentPage" grid-opts="gridOpts" page="currentApp.pages[currentPage]"></ab-page>

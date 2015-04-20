@@ -1,0 +1,22 @@
+<div role="tabpanel">
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" ng-class="{'active': selectedTab === tab}"
+      ng-repeat="tab in tabs"
+      ng-click="showTab(tab)">
+      <a role="tab" href data-toggle="tab">{{tab.label}}</a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane"
+      ng-repeat="tab in tabs"
+      ng-class="{'active': selectedTab === tab}">
+      <ab-compile template="tab.content"></ab-compile>
+    </div>
+  </div>
+
+</div>
+
+<ng-transclude></ng-transclude>

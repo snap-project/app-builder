@@ -11,7 +11,9 @@ angular.module('AppBuilder')
       },
       link: function(scope, element, attrs) {
         attrs.$set('draggable', true);
-        element.bind('dragstart', function() {
+        element.bind('dragstart', function(evt) {
+          evt.dataTransfer.effectAllowed = 'copy';
+          evt.dataTransfer.setData('text/plain', 'dummy'); // Firefox workaround
           abDragDrop.draggedModel = scope.model;
         });
         element.bind('dragend', function() {
@@ -25,12 +27,10 @@ angular.module('AppBuilder')
       restrict: 'A',
       link: function(scope, element, attrs) {
 
-        element.bind('dragenter', function(evt) {
+        element.bind('dragenter dragover', function(evt) {
+          evt.stopPropagation();
           evt.preventDefault();
-        });
-
-        element.bind('dragover', function(evt) {
-          evt.preventDefault();
+          return false;
         });
 
         element.bind('drop', function(evt) {
