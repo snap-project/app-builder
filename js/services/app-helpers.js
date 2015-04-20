@@ -116,6 +116,7 @@ angular.module('AppBuilder')
 
         async.series([
           _localFilesCopyFactory('bower_components', appDir),
+          _localFilesCopyFactory('assets', appDir),
           _localFilesCopyFactory('js/directives', appDir),
           _localFilesCopyFactory('js/services', appDir),
           _localFilesCopyFactory('js/widgets', appDir),
