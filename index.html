@@ -1,36 +1,30 @@
-<html>
+<html ng-app="AppBuilder" ng-cloak ng-controller="MainCtrl">
   <head>
-    <script src="bower_components/platform/platform.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <!-- Fonts -->
-    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
-    <!-- Components -->
-    <link rel="import" href="bower_components/polymer/polymer.html">
-    <link rel="import" href="components/index.html">
-    <!-- Widgets -->
-    <link rel="import" href="widgets/index.html">
+    <meta charset="utf8">
+    <title ng-bind="appTitle"></title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="bower_components/angular-gridster/dist/angular-gridster.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
   </head>
-  <body unresolved>
-
-    <ab-menu id="menu"></ab-menu>
-    <ab-workspace id="workspace"></ab-workspace>
-
-    <ab-tab-panel id="widgets" label="Widgets" icon="puzzle-piece">
-      <ab-widgets-list>
-        <ab-widget-item name="Text" tag="widget-text"></ab-widget-item>
-        <ab-widget-item name="Timeline" tag="widget-timeline"></ab-widget-item>
-        <ab-widget-item name="Media Gallery" tag="widget-media-gallery"></ab-widget-item>
-      </ab-widgets-list>
-    </ab-tab-panel>
-
-    <ab-tab-panel id="settings" label="Settings" icon="gear">
-      <ab-settings></ab-settings>
-    </ab-tab-panel>
-
-    <ab-tab-panel id="library" label="Library" icon="photo">
-      <ab-library></ab-library>
-    </ab-tab-panel>
-
+  <body>
+    <ng-view></ng-view>
+    <input style="display:none;" id="_dirSelector" type="file" nwdirectory />
+    <script src="bower_components/es6-module-loader/dist/es6-module-loader.js"></script>
+    <script src="bower_components/system.js/dist/system.js"></script>
+    <script>
+      /* globals System */
+      System.config({
+        baseURL: 'bower_components',
+        paths: {
+          'js/*': '../js/*.js'
+        },
+        map: {
+          angular: 'angular/angular.min',
+          text: 'plugin-text/text'
+        }
+      });
+      System.import('js/app');
+    </script>
   </body>
-
 </html>

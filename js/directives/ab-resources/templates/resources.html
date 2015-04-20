@@ -1,0 +1,15 @@
+<div style="min-height: 100px; display: block;">
+  <ul class="list-group" ng-show="files.length">
+    <li class="list-group-item" ng-repeat="f in files | filter:matchTypeFilter">
+      <div class="checkbox">
+        <label>
+          <input ng-if="selectMode" type="checkbox" ng-model="_sf" ng-change="toggleFileSelection(f)" />
+          {{ f.name }}
+        </label>
+      </div>
+    </li>
+  </ul>
+  <div class="alert alert-info" ng-hide="files.length">
+    Drop your files here !
+  </div>
+</div>

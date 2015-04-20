@@ -1,0 +1,8 @@
+<div ng-controller="WidgetsListCtrl">
+  <div class="list-group">
+    <div class="list-group-item" ng-repeat="widget in widgets" ab-drag="widget">
+      <h4 class="list-group-item-heading">{{widget.title}}</h4>
+      <p class="list-group-item-text">{{widget.description}}</p>
+    </div>
+  </div>
+</div>

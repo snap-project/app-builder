@@ -1,0 +1,14 @@
+ab-widget-container {
+  display: block;
+}
+
+ab-widget-container > .panel {
+  display: block;
+  overflow: auto;
+  max-height: 100%;
+}
+
+ab-widget-container > .panel > .panel-body > * {
+  height: 100%;
+  width: 100%;
+}

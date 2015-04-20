@@ -1,2 +1,5 @@
 node_modules
 bower_components
+libudev.so.0
+nwjs
+*.log
