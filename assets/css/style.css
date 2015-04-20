@@ -11,4 +11,5 @@ ab-widget-container > .panel {
 ab-widget-container > .panel > .panel-body > * {
   height: 100%;
   width: 100%;
+  display:block;
 }
