@@ -2,105 +2,135 @@
 var angular = require('angular');
 
 angular.module('AppBuilder')
-  .directive('abResources', ['$timeout', function($timeout) {
+  .service('Resources', function() {
 
-    // Globally available files
-    var _files = [];
+    var _resources = {};
 
-    return {
-      restrict: 'E',
-      scope: {
-        'selectMode': '=',
-        'selectedFiles': '=',
-        'typeMatch': '='
-      },
-      template: require('./templates/resources.html!text'),
-      link: function(scope, element) {
+    function _hashCode(str) {
+      return str.split('').reduce(function(a, b) {
+        a = ( ( a << 5 ) - a ) + b.charCodeAt(0);
+        return a&a;
+      }, 0);
+    }
 
-        // Available files
-        scope.files = _files;
-
-        element.bind('dragend dragover', function(evt) {
-          evt.stopPropagation();
-          evt.preventDefault();
-          return false;
-        });
-
-        element.bind('drop', function(evt) {
-
-          evt.stopPropagation();
-          evt.preventDefault();
-
-          for(var f, i = 0; (f = evt.dataTransfer.files[i]); i++) {
-
-            if(f.path) { // nw.js context
-              addFile(f.name, f.type, f.path);
-            } else { // browser context
-              var reader = new FileReader();
-              reader.onload = fileLoadedHandler.bind(reader, f);
-              reader.readAsDataURL(f);
-            }
-
-          }
-
-          function fileLoadedHandler(f, evt) {
-            this.onload = null;
-            addFile(f.name, f.type, evt.target.result);
-          }
-
-          function addFile(name, type, path) {
-
-            for(var f, i = 0; (f = _files[i]); i++) {
-              // File is already added, do nothing
-              if( f.path === path ) {
-                return;
-              }
-            }
-
-            $timeout(function() {
-              scope.files.push({name: name, type: type, path: path });
-            });
-
-          }
-
-          return false;
-
-        });
-
-      },
-      controller: function($scope) {
-
-        $scope.toggleFileSelection = function(file) {
-
-          // If selectedFiles is defined
-          if($scope.selectedFiles) {
-
-            var found = false;
-
-            // We search for the file in selected file
-            for(var f, i = 0; (f = $scope.selectedFiles[i]); i++) {
-              // If file is already added, we remove it
-              if( f.path === file.path ) {
-                $scope.selectedFiles.splice(i, 1);
-                found = true;
-              }
-            }
-
-            // File was not found, we add it to the selected files
-            if(!found) {
-              $scope.selectedFiles.push(file);
-            }
-
-          }
-
-        };
-
-        $scope.matchTypeFilter = function(file) {
-          return true;
-          // TODO implement file type filter
-        };
-
-      }
+    this.add = function(name, type, url) {
+      var resourceId = 'res_' + _hashCode(url).toString(16);
+      _resources[resourceId] = {
+        name: name,
+        type: type,
+        url: url
+      };
+      return resourceId;
     };
-  }])
+
+    this.remove = function(resourceId) {
+      delete _resources[resourceId];
+    };
+
+    this.getUrl = function(resourceId) {
+      return resourceId in _resources ? _resources[resourceId].url : null;
+    };
+
+    this.getName = function(resourceId) {
+      return resourceId in _resources ? _resources[resourceId].name : null;
+    };
+
+    this.getType = function(resourceId) {
+      return resourceId in _resources ? _resources[resourceId].type : null;
+    };
+
+    this.getAvailables = function() {
+      return Object.keys(_resources);
+    };
+
+    this.hasResources = function() {
+      return this.getAvailables().length > 0;
+    };
+
+  })
+  .directive('abResources', [
+    '$timeout', 'Resources',
+    function($timeout, Resources) {
+
+      return {
+        restrict: 'E',
+        scope: {
+          'selectMode': '=',
+          'sResources': '=selectedResources',
+          'typeMatch': '='
+        },
+        template: require('./templates/resources.html!text'),
+        link: function(scope, element) {
+
+          // Available files
+          scope.Resources = Resources;
+
+          element.bind('dragend dragover', function(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            return false;
+          });
+
+          element.bind('drop', function(evt) {
+
+            evt.stopPropagation();
+            evt.preventDefault();
+
+            for(var f, i = 0; (f = evt.dataTransfer.files[i]); i++) {
+
+              if(f.path) { // nw.js context
+                Resources.add(f.name, f.type, f.path);
+              } else { // browser context
+                var reader = new FileReader();
+                reader.onload = fileLoadedHandler.bind(reader, f);
+                reader.readAsDataURL(f);
+              }
+
+            }
+
+            function fileLoadedHandler(f, evt) {
+              this.onload = null;
+              $timeout(function() {
+                Resources.add(f.name, f.type, evt.target.result);
+              });
+            }
+
+            return false;
+
+          });
+
+        },
+        controller: function($scope) {
+
+          $scope.srModels = {};
+
+          $scope.$watch('sResources.length', function() {
+            var sResources = $scope.sResources;
+            if(sResources) {
+              $scope.srModels = {};
+              sResources.forEach(function(rId) {
+                $scope.srModels[rId] = true;
+              });
+            }
+          });
+
+          $scope.selectResource = function(rId) {
+
+            var sResources = $scope.sResources;
+
+            if(sResources) {
+              var rIndex = sResources.indexOf(rId);
+              if(rIndex !== -1) {
+                sResources.splice(rIndex, 1);
+              } else {
+                sResources.push(rId);
+              }
+            }
+
+          };
+
+        }
+      };
+    }
+  ])
 ;

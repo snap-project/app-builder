@@ -4,26 +4,25 @@ var angular = require('angular');
 angular.module('AppBuilder')
   .service('WidgetsRegistry', function() {
 
-    var _register = [];
+    var _definitions = [];
 
-    this.addSchema = function(widgetSchema) {
+    this.addDefinition = function(widgetDefinition) {
 
-      _register.push({
-        tag: widgetSchema.tag,
-        description: widgetSchema.description,
-        title: widgetSchema.title,
-        configTemplate: widgetSchema.configTemplate,
-        defaultData: widgetSchema.defaultData
+      _definitions.push({
+        tag: widgetDefinition.tag,
+        description: widgetDefinition.description,
+        title: widgetDefinition.title,
+        defaultData: widgetDefinition.defaultData
       });
 
     };
 
-    this.getSchemas = function() {
-      return _register;
+    this.getDefinitions = function() {
+      return _definitions;
     };
 
-    this.getSchemaByTag = function(tag) {
-      return _register.reduce(function(result, widget) {
+    this.getDefinitionByTag = function(tag) {
+      return _definitions.reduce(function(result, widget) {
         if(widget.tag === tag) {
           result = widget;
         }
@@ -33,20 +32,20 @@ angular.module('AppBuilder')
 
     this.createWidgetForTag = function(tag) {
 
-      var schema = this.getSchemaByTag(tag);
+      var definition = this.getDefinitionByTag(tag);
 
-      if(!schema) {
-        throw new Error('Unknown widget tag ' + tag + ' !');
+      if(!definition) {
+        throw new Error('Unknown widget tag "' + tag + '" !');
       }
 
       return {
-        type: tag,
-        data: angular.copy(schema.defaultData || {}),
+        tag: tag,
+        data: angular.copy(definition.defaultData || {}),
         tile: {
           row: null,
           col: null,
-          sizeX: 1,
-          sizeY: 1
+          sizeX: null,
+          sizeY: null
         }
       };
 

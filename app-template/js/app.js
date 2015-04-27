@@ -60,7 +60,6 @@ angular.module('AppBuilder')
         if(!manifest) return;
 
         var appBuilder = manifest.appBuilder;
-        var pages = Object.keys(appBuilder.pages);
         var page = appBuilder.pages[$routeParams.pageId];
 
         if(!page) {

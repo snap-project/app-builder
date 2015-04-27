@@ -10,11 +10,15 @@ angular.module('AppBuilder')
         'expose': '='
       },
       link: function(scope, element) {
-        var tpl = $compile(scope.template);
-        var childScope = scope.$new(true);
-        angular.extend(childScope, scope.expose);
-        var el = tpl(childScope);
-        element.append(el);
+        scope.$watch('template', function(template) {
+          if(template) {
+            var tpl = $compile(template);
+            var childScope = scope.$new(true);
+            angular.extend(childScope, scope.expose);
+            var el = tpl(childScope);
+            element.html('').append(el);
+          }
+        });
       }
     };
   }])

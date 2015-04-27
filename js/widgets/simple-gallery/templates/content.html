@@ -1,9 +1,20 @@
-<div style="width: 100%; height: 100%;">
-  <div class="alert alert-warning" ng-hide="currentImage">
-    No image selected yet !
+<div class="row">
+  <div class="col-md-12">
+    <div class="alert alert-warning" ng-hide="currentImage">
+      No image selected yet !
+    </div>
+    <img ng-show="data.selectedImages.length"
+      ng-src="{{ Resources.getUrl(currentImage) }}"
+      class="img-responsive"
+      alt="{{ Resources.getName(currentImage) }}" />
   </div>
-  <img ng-show="data.selectedImages.length"
-    ng-src="{{currentImage.path}}"
-    class="img-responsive"
-    alt="{{currentImage.name}}" />
+</div>
+<div class="row">
+  <nav ng-show="data.selectedImages.length > 1">
+    <ul class="pagination">
+      <li ng-repeat="img in data.selectedImages">
+        <a href ng-click="selectImage(img)">{{ $index }}</a>
+      </li>
+    </ul>
+  </nav>
 </div>

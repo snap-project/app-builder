@@ -16,7 +16,7 @@ angular.module('AppBuilder')
 
           $scope.dispatchWidgetFocus = function(widget) {
             $rootScope.$broadcast('abPageWidgetFocus', widget);
-          }
+          };
 
         }
       };
@@ -31,11 +31,11 @@ angular.module('AppBuilder')
         template: require('./templates/ab-widget-container.html!text'),
         scope: {
           'data': '=widgetData',
-          'type': '=widgetType',
+          'tag': '=widgetTag',
           'title': '=widgetTitle'
         },
         link: function(scope, element) {
-          var tpl = $compile('<'+scope.type+' widget-data="data"></'+scope.type+'>');
+          var tpl = $compile('<'+scope.tag+' widget-data="data"></'+scope.tag+'>');
           var el = tpl(scope);
           angular.element(element.find('div')[1]).append(el);
         }

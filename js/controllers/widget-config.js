@@ -3,19 +3,20 @@ var angular = require('angular');
 
 angular.module('AppBuilder')
   .controller('WidgetConfigCtrl', [
-    '$scope', 'WidgetsRegistry', '$timeout',
-    function($scope, WidgetsRegistry, $timeout) {
+    '$scope', 'WidgetsRegistry',
+    function($scope, WidgetsRegistry) {
 
-      $scope.configTemplate = '';
-      $scope.widgetData = null;
+      $scope.exposedData = {
+        widgetData: null
+      };
 
       $scope.$on('abPageWidgetFocus', function(evt, widget) {
-        var widgetDef = WidgetsRegistry.getSchemaByTag(widget.type);
-        $scope.configTemplate = '';
-        $timeout(function() {
-          $scope.configTemplate = widgetDef ? widgetDef.configTemplate : '';
-          $scope.widgetData = widget.data;
-        });
+        $scope.exposedData.widgetData = widget.data;
+        var widgetDefinition = WidgetsRegistry.getDefinitionByTag(widget.tag);
+        $scope.widgetConfigTemplate = '<'+widgetDefinition.tag+'-config ' +
+          'widget-data="widgetData" class="widget-config-' + Date.now() + '">' +
+          '</'+widgetDefinition.tag+'-config>'
+        ;
       });
 
     }

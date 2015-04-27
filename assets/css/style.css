@@ -5,11 +5,11 @@ ab-widget-container {
 ab-widget-container > .panel {
   display: block;
   overflow: auto;
-  max-height: 100%;
+  height: 100%;
+  margin-bottom: 0;
 }
 
 ab-widget-container > .panel > .panel-body > * {
-  height: 100%;
+  display: block;
   width: 100%;
-  display:block;
 }

@@ -6,7 +6,7 @@ angular.module('AppBuilder')
     '$scope', 'WidgetsRegistry',
     function($scope, WidgetsRegistry) {
 
-      $scope.widgets = WidgetsRegistry.getSchemas();
+      $scope.widgets = WidgetsRegistry.getDefinitions();
 
     }
   ])

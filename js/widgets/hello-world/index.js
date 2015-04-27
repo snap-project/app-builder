@@ -4,7 +4,7 @@ var angular = require('angular');
 angular.module('AppBuilder')
   .run(['WidgetsRegistry', function(WidgetsRegistry) {
 
-    WidgetsRegistry.addSchema({
+    WidgetsRegistry.addDefinition({
       tag: 'hello-world-widget',
       title: 'Hello World',
       description: 'A basic Hello World widget. Serve as a demo',
@@ -16,6 +16,15 @@ angular.module('AppBuilder')
     return {
       restrict: 'E',
       template: require('./templates/content.html!text'),
+      scope: {
+        data: '=widgetData'
+      }
+    };
+  })
+  .directive('helloWorldWidgetConfig', function() {
+    return {
+      restrict: 'E',
+      template: require('./templates/config.html!text'),
       scope: {
         data: '=widgetData'
       }

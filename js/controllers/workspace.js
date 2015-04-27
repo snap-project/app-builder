@@ -8,9 +8,12 @@ angular.module('AppBuilder')
 
       $scope.gridOpts = {
         draggable: {
-          enabled: true,
-          handle: '.panel-heading'
-        }
+          enabled: true
+        },
+        columns: 12,
+        minColumns: 2,
+        defaultSizeX: 2,
+        defaultSizeY: 2,
       };
 
       $scope.currentApp = AppHelpers.getCurrentApp();

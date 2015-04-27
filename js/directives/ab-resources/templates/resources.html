@@ -1,15 +1,15 @@
 <div style="min-height: 100px; display: block;">
-  <ul class="list-group" ng-show="files.length">
-    <li class="list-group-item" ng-repeat="f in files | filter:matchTypeFilter">
+  <ul class="list-group" ng-show="Resources.hasResources()">
+    <li class="list-group-item" ng-repeat="rId in Resources.getAvailables()">
       <div class="checkbox">
         <label>
-          <input ng-if="selectMode" type="checkbox" ng-model="_sf" ng-change="toggleFileSelection(f)" />
-          {{ f.name }}
+          <input ng-if="selectMode" type="checkbox" ng-model="srModels[rId]" ng-change="selectResource(rId)" />
+          {{ Resources.getName(rId) }}
         </label>
       </div>
     </li>
   </ul>
-  <div class="alert alert-info" ng-hide="files.length">
+  <div class="alert alert-info" ng-hide="Resources.hasResources()">
     Drop your files here !
   </div>
 </div>
