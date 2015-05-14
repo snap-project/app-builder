@@ -1,0 +1,1 @@
+/home/william/workspace/kezaco/src/Kezaco/EditorBundle/Resources/public/js/deps.js
