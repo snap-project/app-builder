@@ -1,1 +1,0 @@
-web/editor/js/deps.js

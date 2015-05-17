@@ -2,9 +2,13 @@
 
 var angular = require('angular');
 
-var deps = require('./deps');
+require('angular-gridster/dist/angular-gridster.min');
+require('angular-route/angular-route');
 
-angular.module('AppBuilder', deps);
+angular.module('AppBuilder', [
+  'ngRoute',
+  'gridster'
+]);
 
 angular.module('AppBuilder')
   .config([

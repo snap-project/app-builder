@@ -44,15 +44,23 @@ angular.module('AppBuilder')
         this.name = name || 'New app ' + new Date();
         this.pages = [];
         this.resources = {};
+        this.meta = {};
       }
 
-      App.fromWebAppManifest = function(appManifest) {
-        // TODO
+      App.fromManifest = function(manifest) {
+        var app = new App(manifest.name);
+        app.pages = manifest.appBuilder.pages || [];
+        app.resources = manifest.appBuilder.resources || {};
+        return app;
       };
 
-      App.prototype.toWebAppManifest = function() {
+      App.prototype.toManifest = function() {
         return {
-
+          name: this.name,
+          appBuilder: {
+            pages: this.pages,
+            resources: this.resources
+          }
         };
       };
 
@@ -61,6 +69,8 @@ angular.module('AppBuilder')
         this.pages.push(page);
         return this.pages.length-1;
       };
+
+      this.App = App;
 
     }
   ])
