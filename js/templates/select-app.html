@@ -1,0 +1,30 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <div class="panel panel-default" ng-controller="AppSelectorCtrl" style="margin-top: 50px">
+        <div class="panel-heading">Select you app</div>
+        <div class="panel-body">
+          <ul class="list-group">
+            <li class="list-group-item"
+              ng-click="selectApp('new')"
+              ng-class="{'active': isAppSelected('new') }">
+              <label>New App</label>
+              <input type="text" class="form-control" ng-model="newAppName" placeholder="Your new app's name">
+            </li>
+            <li class="list-group-item"
+              ng-click="selectApp(app)"
+              ng-class="{'active': isAppSelected(app) }"
+              ng-repeat="app in apps">
+              {{ app.name }}
+            </li>
+          </ul>
+          <button ng-disabled="!hasAppSelected()"
+            ng-click="openSelectedApp()"
+            class="btn btn-success pull-right">
+            Open
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

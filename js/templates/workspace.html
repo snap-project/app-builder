@@ -16,7 +16,7 @@
       </ab-tabs-container>
     </div>
     <div class="col-md-8" ng-controller="WorkspaceCtrl" ab-drop>
-      <ab-page ng-if="currentPage" grid-opts="gridOpts" page="currentApp.pages[currentPage]"></ab-page>
+      <ab-page grid-opts="gridOpts" page="currentApp.pages[currentPage]"></ab-page>
     </div>
     <div class="col-md-2">
       <ng-include src="'js/templates/_widget-config.html'"></ng-include>

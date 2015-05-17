@@ -3,8 +3,8 @@ var angular = require('angular');
 
 angular.module('AppBuilder')
   .controller('WorkspaceCtrl', [
-    '$scope', '$timeout', 'WidgetsRegistry', 'AppHelpers',
-    function($scope, $timeout, WidgetsRegistry, AppHelpers) {
+    '$scope', '$timeout', 'WidgetsRegistry', 'Apps',
+    function($scope, $timeout, WidgetsRegistry, Apps) {
 
       $scope.gridOpts = {
         draggable: {
@@ -16,23 +16,12 @@ angular.module('AppBuilder')
         defaultSizeY: 2,
       };
 
-      $scope.currentApp = AppHelpers.getCurrentApp();
-      $scope.currentPage = null;
+      $scope.currentApp = Apps.getCurrentApp();
+      $scope.currentPage = 0;
 
-      $scope.$watch('currentApp.pages', function(pages) {
-
-        if(!pages) return;
-
-        var pagesIds = Object.keys(pages);
-
-        if(pagesIds.length === 0) {
-          pages['page-1'] = [];
-          $scope.currentPage = 'page-1';
-        } else {
-          $scope.currentPage = pagesIds[0];
-        }
-
-      });
+      if($scope.currentApp.pages.length === 0) {
+        $scope.currentApp.newPage();
+      }
 
       $scope.$on('abDrop', function(evt, data) {
 

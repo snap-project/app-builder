@@ -12,10 +12,24 @@ angular.module('AppBuilder')
     function($routeProvider) {
 
       $routeProvider
-        .when('/', {
-          template: require('./templates/layout.html!text')
+        .when('/select-app', {
+          template: require('./templates/select-app.html!text')
         })
-        .otherwise('/')
+        .when('/workspace', {
+          template: require('./templates/workspace.html!text'),
+          resolve: {
+            load: ['$q', '$location', 'Apps', function($q, $location, Apps) {
+              return $q(function(resolve, reject) {
+                if(!Apps.getCurrentApp()) {
+                  $location.path('/select-app');
+                  return reject();
+                }
+                return resolve();
+              });
+            }]
+          }
+        })
+        .otherwise('/select-app')
       ;
 
     }
