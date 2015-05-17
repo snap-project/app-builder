@@ -17,7 +17,7 @@ angular.module('AppBuilder')
         _currentApp = app;
       };
 
-      this.getCurrentApp = function(app) {
+      this.getCurrentApp = function() {
         return _currentApp;
       };
 
@@ -26,7 +26,8 @@ angular.module('AppBuilder')
       };
 
       this.save = function(app) {
-        return $q(function(resolve, reject) {
+        app.resources = Resources.toJSON();
+        return $q(function(resolve) {
           var index = _apps.indexOf(app);
           if( index === -1) {
             _apps.push(app);
@@ -60,7 +61,6 @@ angular.module('AppBuilder')
         this.pages.push(page);
         return this.pages.length-1;
       };
-
 
     }
   ])

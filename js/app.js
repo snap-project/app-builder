@@ -18,15 +18,16 @@ angular.module('AppBuilder')
         .when('/workspace', {
           template: require('./templates/workspace.html!text'),
           resolve: {
-            load: ['$q', '$location', 'Apps', function($q, $location, Apps) {
-              return $q(function(resolve, reject) {
+            load: [
+              '$q', '$location', 'Apps', 'AppLoader',
+              function($q, $location, Apps, AppLoader) {
                 if(!Apps.getCurrentApp()) {
                   $location.path('/select-app');
-                  return reject();
+                  return $q.reject();
                 }
-                return resolve();
-              });
-            }]
+                return AppLoader.loadApp(Apps.getCurrentApp());
+              }
+            ]
           }
         })
         .otherwise('/select-app')

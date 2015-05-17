@@ -3,17 +3,18 @@ var angular = require('angular');
 
 angular.module('AppBuilder')
   .controller('MainCtrl', [
-    '$scope', 'AppHelpers',
-    function($scope, AppHelpers) {
+    '$scope', 'Apps', '$location',
+    function($scope, Apps, $location) {
 
       $scope.appTitle = 'AppBuilder';
 
       $scope.saveApp = function() {
-        AppHelpers.saveApp();
+        var currentApp = Apps.getCurrentApp();
+        Apps.save(currentApp);
       };
 
       $scope.openApp = function() {
-        AppHelpers.openApp();
+        $location.path('/select-app');
       };
 
     }

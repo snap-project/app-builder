@@ -1,27 +1,40 @@
 /* jshint node:true */
 var angular = require('angular');
-
+var uuid = require('node-uuid/uuid');
 
 angular.module('AppBuilder')
   .service('Resources', function() {
 
     var _resources = {};
 
-    function _hashCode(str) {
-      return str.split('').reduce(function(a, b) {
-        a = ( ( a << 5 ) - a ) + b.charCodeAt(0);
-        return a&a;
-      }, 0);
+    function _getResourceIdForUrl(url) {
+      var resId, res;
+      for(resId in _resources) {
+        if(_resources.hasOwnProperty(resId)) {
+          res = _resources[resId];
+          if(res.url === url) {
+            return resId;
+          }
+        }
+      }
     }
 
     this.add = function(name, type, url) {
-      var resourceId = 'res_' + _hashCode(url).toString(16);
+
+      var resourceId = _getResourceIdForUrl(url);
+
+      if(resourceId) return resourceId;
+
+      resourceId = uuid.v4();
+
       _resources[resourceId] = {
         name: name,
         type: type,
         url: url
       };
+
       return resourceId;
+
     };
 
     this.remove = function(resourceId) {
@@ -46,6 +59,27 @@ angular.module('AppBuilder')
 
     this.hasResources = function() {
       return this.getAvailables().length > 0;
+    };
+
+    this.toJSON = function() {
+      return _resources;
+    };
+
+    this.load = function(resources) {
+      _resources = {};
+      var resId, res;
+      for(resId in resources) {
+        if(resources.hasOwnProperty(resId)) {
+          res = resources[resId];
+          if(!_getResourceIdForUrl(res.url)) {
+            _resources[resId] = {
+              name: res.name,
+              type: res.type,
+              url: res.url
+            };
+          }
+        }
+      }
     };
 
   })
